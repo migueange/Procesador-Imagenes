@@ -5,13 +5,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javax.imageio.ImageIO;
 
@@ -21,7 +19,7 @@ import javax.imageio.ImageIO;
  */
 public class ContenedorImagenes extends HBox {
 
-    private StackPane izq, der;
+    private final StackPane izq, der;
     private Image original, procesada;
 
     /**
@@ -40,7 +38,7 @@ public class ContenedorImagenes extends HBox {
     }
 
     /**
-     *
+     * 
      * @param img
      */
     public void setImagenOriginal(File img) {

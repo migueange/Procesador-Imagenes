@@ -2,18 +2,11 @@ package Vista;
 
 import Controlador.Controlador;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import javafx.collections.FXCollections;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -40,6 +33,7 @@ public class Controles extends HBox {
     /**
      *
      * @param stage
+     * @param contenedorImagenes
      */
     public Controles(Stage stage, ContenedorImagenes contenedorImagenes) {
         super();
@@ -47,7 +41,7 @@ public class Controles extends HBox {
         selectorFiltro = new ComboBox(FXCollections.observableArrayList(
                 "Tonos de grises por promedio",
                 "Convertir a grises 1",
-                "Convertir a grises 2",
+                "Tonos de grises por porcentaje",
                 "Mosaico",
                 "Red, Green or Blue",
                 "Micas"
