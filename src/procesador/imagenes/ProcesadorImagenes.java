@@ -5,6 +5,7 @@
  */
 package procesador.imagenes;
 
+import Vista.Contenedor;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -20,25 +21,12 @@ import javafx.stage.Stage;
 public class ProcesadorImagenes extends Application {
     
     @Override
-    public void start(Stage primaryStage) {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
-        
-        StackPane root = new StackPane();
-        root.getChildren().add(btn);
-        
-        Scene scene = new Scene(root, 300, 250);
-        
-        primaryStage.setTitle("Hello World!");
+    public void start(Stage primaryStage) {               
+        Scene scene = new Scene(new Contenedor(primaryStage), 950, 600);        
+        primaryStage.setResizable(false);
+        primaryStage.setTitle("Procesador Imágenes");
         primaryStage.setScene(scene);
-        primaryStage.show();
+        primaryStage.show();       
     }
 
     /**
