@@ -14,8 +14,8 @@ import javafx.scene.layout.StackPane;
 import javax.imageio.ImageIO;
 
 /**
- *
- * @author miguelita
+ * Contiene las imagenes, original y procesada
+ * @author miguel
  */
 public class ContenedorImagenes extends HBox {
 
@@ -35,6 +35,7 @@ public class ContenedorImagenes extends HBox {
         der.setPrefSize(475, 400);
         super.setPrefSize(950, 400);
         super.getChildren().addAll(izq, der);
+        super.setStyle("-fx-background-color: #DCDCDC;");
     }
 
     /**

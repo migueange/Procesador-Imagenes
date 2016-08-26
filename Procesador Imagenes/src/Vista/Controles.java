@@ -73,13 +73,13 @@ public class Controles extends HBox {
                      B = new Label("0  ");
                     sliderR = new Slider(0, 255, 0);
                     sliderR.setPrefWidth(250);
-                    sliderR.valueProperty().addListener((ov, oldvalue, newvalue) -> {                        
-                        R.setText(newvalue.intValue()+"");
+                    sliderR.valueProperty().addListener((ov, oldvalue, newvalue) -> {
+                        R.setText(newvalue.intValue() + "");
                     });
                     sliderG = new Slider(0, 255, 0);
                     sliderG.setPrefWidth(250);
                     sliderG.valueProperty().addListener((ov, oldvalue, newvalue) -> {
-                        G.setText(newvalue.intValue()+"");
+                        G.setText(newvalue.intValue() + "");
                     });
                     sliderB = new Slider(0, 255, 0);
                     sliderB.setPrefWidth(250);
@@ -114,12 +114,24 @@ public class Controles extends HBox {
         /*Empezar proceso*/
         procesar = new Button("Procesar");
         procesar.setOnAction(event -> {
+            if(imagen == null){
+                Mensajes.muestraError("Por favor cargue una imagen","");
+                return;
+            }
+            if(selectorFiltro.getValue() == null){
+                Mensajes.muestraError("Por favor seleccione un filtro", "");
+                return;
+            }
             try {
                 switch (selectorFiltro.getValue().toString()) {
-                    case "Tonos de grises por promedio":
+                    case "Tonos de grises por promedio":                                                    
                         contenedorImagenes.setImagenProcesada(Filtros.tonosDeGrisesPorPromedio(imagen), imagen);
                         break;
                     case "Tonos de grises por color":
+                        if(selectorColor.getValue() == null){
+                            Mensajes.muestraError("Por favor seleccione un color", "");
+                            return;
+                        }
                         contenedorImagenes.setImagenProcesada(Filtros.tonosDeGrisesPorColor(imagen, selectorColor.getValue().toString()), imagen);
                         break;
                     case "Tonos de grises por porcentaje":
@@ -128,37 +140,34 @@ public class Controles extends HBox {
                     case "Mosaico":
                         break;
                     case "Red, Green or Blue":
+                        if(selectorColor.getValue() == null){
+                            Mensajes.muestraError("Por favor seleccione un color", "");
+                            return;
+                        }
                         contenedorImagenes.setImagenProcesada(Filtros.colorDominante(imagen, selectorColor.getValue().toString()), imagen);
                         break;
                     case "Micas":
+                        
                         contenedorImagenes.setImagenProcesada(Filtros.micas(imagen, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue()), imagen);
                         break;
                 }
 
-            } catch (Exception ioe) {
-                ioe.printStackTrace();
+            } catch (IOException ioe) {
+                Mensajes.muestraError("Hubo un error en el proceso", "Intentelo de nuevo");
             }
         }
         );
         /*Contenedores*/
         StackPane botonesDerecha = new StackPane(procesar);
-
-        botonesDerecha.setPrefSize(
-                225, 100);
+        botonesDerecha.setPrefSize(225, 100);
         botonesDerecha.setAlignment(Pos.CENTER);
         VBox botonesIzquierda = new VBox(cargarImagen, selectorFiltro);
-
-        botonesIzquierda.setPrefSize(
-                225, 100);
+        botonesIzquierda.setPrefSize(225, 100);
         botonesIzquierda.setAlignment(Pos.CENTER);
-
-        botonesIzquierda.setSpacing(
-                10);
+        botonesIzquierda.setSpacing(10);
         /*Propiedades HBox controles*/
-        super.getChildren()
-                .addAll(botonesIzquierda, opciones, botonesDerecha);
-        super.setPrefSize(
-                950, 100);
+        super.getChildren().addAll(botonesIzquierda, opciones, botonesDerecha);
+        super.setPrefSize(950, 100);
     }
 
 }
