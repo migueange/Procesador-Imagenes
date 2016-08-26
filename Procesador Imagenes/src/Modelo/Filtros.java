@@ -77,4 +77,53 @@ public class Filtros {
         }
         return procesada;
     }
+
+    /**
+     * 
+     * @param img
+     * @param colorD
+     * @return
+     * @throws IOException 
+     */
+    public static BufferedImage colorDominante(File img, String colorD) throws IOException {
+        BufferedImage original = ImageIO.read(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                Color colorDominante;
+                if(colorD.equals("Red")){
+                    colorDominante = new Color(color.getRed(),0,0);
+                }else if (colorD.equals("Green")){
+                    colorDominante = new Color(0,color.getGreen(),0);
+                }else{
+                    colorDominante = new Color(0,0,color.getBlue());
+                }
+                procesada.setRGB(j, i, colorDominante.getRGB());
+            }
+        }
+        return procesada;
+    }
+    
+    /**
+     * 
+     * @param img
+     * @param r
+     * @param g
+     * @param b
+     * @return
+     * @throws IOException 
+     */
+    public static BufferedImage micas(File img,int r,int g,int b) throws IOException{
+        BufferedImage original = ImageIO.read(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Color colorMica = new Color(r, g, b);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));                                                
+                procesada.setRGB(j, i, colorMica.getRGB() & color.getRGB());
+            }
+        }
+        return procesada;        
+    }
 }

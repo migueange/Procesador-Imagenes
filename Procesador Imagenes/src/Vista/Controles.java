@@ -1,16 +1,16 @@
 package Vista;
 
-import Controlador.Controlador;
 import Modelo.Filtros;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -24,12 +24,13 @@ import javax.imageio.ImageIO;
  */
 public class Controles extends HBox {
 
-    private final ComboBox selectorFiltro, selectorColor;
+    private ComboBox selectorFiltro, selectorColor;
     private final HBox opciones;
     private final Button procesar;
     private final Button cargarImagen;
     private final FileChooser fileChooser;
     private File imagen;
+    private Slider sliderR, sliderG, sliderB;
 
     /**
      *
@@ -41,6 +42,8 @@ public class Controles extends HBox {
         /*Opciones de cada filtro*/
         opciones = new HBox();
         opciones.setPrefSize(500, 100);
+        opciones.setAlignment(Pos.CENTER);
+        opciones.setSpacing(50);
         /*ChoiceBox para escoger filtro*/
         selectorColor = new ComboBox(FXCollections.observableArrayList("Red", "Green", "Blue"));
         selectorColor.setPromptText("Seleccionar color");
@@ -54,12 +57,38 @@ public class Controles extends HBox {
         ));
         selectorFiltro.setPromptText("Seleccionar filtro");
         selectorFiltro.setOnAction(event -> {
-            if(!opciones.getChildren().isEmpty()){
+            if (!opciones.getChildren().isEmpty()) {
                 opciones.getChildren().remove(0, 2);
-            }                        
+            }
             switch (selectorFiltro.getValue().toString()) {
                 case "Tonos de grises por color":
-                    opciones.getChildren().addAll(new Label("Opciones"), selectorColor);
+                    opciones.getChildren().addAll(new Label("Opciones: "), selectorColor);
+                    break;
+                case "Red, Green or Blue":
+                    opciones.getChildren().addAll(new Label("Opciones: "), selectorColor);
+                    break;
+                case "Micas":
+                    Label R = new Label("0  "),
+                     G = new Label("0  "),
+                     B = new Label("0  ");
+                    sliderR = new Slider(0, 255, 0);
+                    sliderR.setPrefWidth(250);
+                    sliderR.valueProperty().addListener((ov, oldvalue, newvalue) -> {                        
+                        R.setText(newvalue.intValue()+"");
+                    });
+                    sliderG = new Slider(0, 255, 0);
+                    sliderG.setPrefWidth(250);
+                    sliderG.valueProperty().addListener((ov, oldvalue, newvalue) -> {
+                        G.setText(newvalue.intValue()+"");
+                    });
+                    sliderB = new Slider(0, 255, 0);
+                    sliderB.setPrefWidth(250);
+                    sliderB.valueProperty().addListener((ov, oldvalue, newvalue) -> {
+                        B.setText(newvalue.intValue() + "");
+                    });
+                    VBox contenedorSliders = new VBox(new HBox(new Label("R: "), sliderR, R), new HBox(new Label("G: "), sliderG, G), new HBox(new Label("B: "), sliderB, B));
+                    contenedorSliders.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliders);
                     break;
             }
         });
@@ -99,8 +128,10 @@ public class Controles extends HBox {
                     case "Mosaico":
                         break;
                     case "Red, Green or Blue":
+                        contenedorImagenes.setImagenProcesada(Filtros.colorDominante(imagen, selectorColor.getValue().toString()), imagen);
                         break;
                     case "Micas":
+                        contenedorImagenes.setImagenProcesada(Filtros.micas(imagen, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue()), imagen);
                         break;
                 }
 
