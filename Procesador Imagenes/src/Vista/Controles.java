@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -89,7 +90,7 @@ public class Controles extends HBox {
                     VBox contenedorSliders = new VBox(new HBox(new Label("R: "), sliderR, R), new HBox(new Label("G: "), sliderG, G), new HBox(new Label("B: "), sliderB, B));
                     contenedorSliders.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliders);
-                    break;
+                    break;               
             }
         });
         /*Selector de archivo*/
@@ -113,7 +114,7 @@ public class Controles extends HBox {
         });
         /*Empezar proceso*/
         procesar = new Button("Procesar");
-        procesar.setOnAction(event -> {
+        procesar.setOnAction((ActionEvent event) -> {
             if(imagen == null){
                 Mensajes.muestraError("Por favor cargue una imagen","");
                 return;
@@ -138,6 +139,7 @@ public class Controles extends HBox {
                         contenedorImagenes.setImagenProcesada(Filtros.tonosDeGrisesPorPorcentaje(imagen), imagen);
                         break;
                     case "Mosaico":
+                        contenedorImagenes.setImagenProcesada(Filtros.mosaico(imagen,5,10), imagen);
                         break;
                     case "Red, Green or Blue":
                         if(selectorColor.getValue() == null){
@@ -146,8 +148,7 @@ public class Controles extends HBox {
                         }
                         contenedorImagenes.setImagenProcesada(Filtros.colorDominante(imagen, selectorColor.getValue().toString()), imagen);
                         break;
-                    case "Micas":
-                        
+                    case "Micas":                        
                         contenedorImagenes.setImagenProcesada(Filtros.micas(imagen, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue()), imagen);
                         break;
                 }

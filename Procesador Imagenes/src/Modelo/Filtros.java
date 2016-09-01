@@ -59,6 +59,7 @@ public class Filtros {
 
     /**
      * Convierte la imagen tomando el valor del color seleccionado.
+     *
      * @param img
      * @param colorS
      * @return
@@ -80,6 +81,7 @@ public class Filtros {
 
     /**
      * Toma un color y lo fija, mientras que los otros dos los fija en cero.
+     *
      * @param img
      * @param colorD
      * @return
@@ -107,6 +109,7 @@ public class Filtros {
 
     /**
      * Crea una "mica" del color que inidiquen los valores rgb
+     *
      * @param img
      * @param r
      * @param g
@@ -128,20 +131,37 @@ public class Filtros {
     }
 
     /**
-     * 
+     *
      * @param img
+     * @param n
+     * @param m
      * @return
-     * @throws IOException 
      */
-    public static BufferedImage mosaico(File img,int n,int m) throws IOException {
+    public static BufferedImage mosaico(File img, int n, int m) throws IOException {
         BufferedImage original = ImageIO.read(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < original.getHeight(); i++) {
-            for (int j = 0; j < original.getWidth(); j++) {                
+        for (int i = 0; i < original.getHeight(); i += m) {
+            for (int j = 0; j < original.getWidth(); j += n) {
+                int r = 0;
+                int g = 0;
+                int b = 0;
+                for (int k = i; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++) {
+                    for (int l = j; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++) {
+                        //System.out.print(String.format("  [%d][%d] ",l,k));
+                        Color color = new Color(original.getRGB(l, k));
+                        r += color.getRed();
+                        g += color.getGreen();
+                        b += color.getBlue();
+                    }
+                }
+                for (int k = i; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++) {
+                    for (int l = j; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++) {
+                        procesada.setRGB(l, k, new Color(r / (n * m), b / (n * m), g / (n * m)).getRGB());
+                    }
+                }
             }
         }
         return procesada;
     }
-    
-    
+
 }
