@@ -56,7 +56,8 @@ public class Controles extends HBox {
                 "Tonos de grises por porcentaje",
                 "Mosaico",
                 "Red, Green or Blue",
-                "Micas"
+                "Micas",
+                "Blur"
         ));
         selectorFiltro.setPromptText("Seleccionar filtro");
         selectorFiltro.setOnAction(event -> {
@@ -174,6 +175,9 @@ public class Controles extends HBox {
                         break;
                     case "Micas":
                         contenedorImagenes.setImagenProcesada(Filtros.micas(imagen, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue()), imagen);
+                        break;
+                    case "Blur":
+                        contenedorImagenes.setImagenProcesada(Filtros.blur(imagen), imagen);
                         break;
                 }
 

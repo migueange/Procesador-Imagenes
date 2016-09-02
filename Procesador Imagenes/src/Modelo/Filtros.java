@@ -169,6 +169,27 @@ public class Filtros {
     }
 
     /**
+     * ***************************************************** Convolucion
+     * **************************************************************
+     */
+    /**
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage blur(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {0, 0, 1, 0, 0},
+            {0, 1, 1, 1, 0},
+            {1, 1, 1, 1, 1},
+            {0, 1, 1, 1, 0},
+            {0, 0, 1, 0, 0}
+        };
+        return aplicaConvolucion(img, filtro, 1.0 / 13.0, 0);
+    }
+
+    /**
      *
      * @param img
      * @param filtro
@@ -176,22 +197,27 @@ public class Filtros {
      * @param bias
      * @return
      */
-    private BufferedImage convolucion(File img, double[][] filtro, double factor, double bias) throws IOException {
+    private static BufferedImage aplicaConvolucion(File img, double[][] filtro, double factor, double bias) throws IOException {
         BufferedImage original = ImageIO.read(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
 
         for (int i = 0; i < original.getHeight(); i++) {
             for (int j = 0; j < original.getWidth(); j++) {
-                double r, g, b;
-                for (int k = 0; k < filtro.length; k++) {
-                    for (int l = 0; l < filtro.length; l++) {
-                       
+                double r = 0, g = 0, b = 0;
+                for (int k = 0; k < filtro.length; k++) {//altura
+                    for (int l = 0; l < filtro.length; l++) {    //anchura                    
+                        Color color = new Color(original.getRGB((j - filtro.length / 2 + l + original.getWidth()) % original.getWidth(), (i - filtro.length / 2 + k + original.getHeight()) % original.getHeight()));
+                        r += color.getRed() * filtro[k][l];
+                        g += color.getGreen() * filtro[k][l];
+                        b += color.getBlue() * filtro[k][l];
                     }
                 }
-
+                r = Math.min(Math.max(factor * r + bias, 0), 255);
+                g = Math.min(Math.max(factor * g + bias, 0), 255);
+                b = Math.min(Math.max(factor * b + bias, 0), 255);
+                procesada.setRGB(j, i, new Color((int) r, (int) g, (int) b).getRGB());
             }
         }
-
         return procesada;
     }
 
