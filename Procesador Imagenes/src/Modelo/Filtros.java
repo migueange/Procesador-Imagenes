@@ -138,11 +138,12 @@ public class Filtros {
      * @param n
      * @param m
      * @return
+     * @throws java.io.IOException
      */
     public static BufferedImage mosaico(File img, int n, int m) throws IOException {
         BufferedImage original = ImageIO.read(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-        int r = 0, g = 0, b = 0;
+        int r, g, b;
         /* Recorrer bloques de nxm */
         for (int i = 0; i < original.getHeight(); i += m) {
             for (int j = 0; j < original.getWidth(); j += n) {
@@ -164,6 +165,33 @@ public class Filtros {
                 }
             }
         }
+        return procesada;
+    }
+
+    /**
+     *
+     * @param img
+     * @param filtro
+     * @param factor
+     * @param bias
+     * @return
+     */
+    private BufferedImage convolucion(File img, double[][] filtro, double factor, double bias) throws IOException {
+        BufferedImage original = ImageIO.read(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                double r, g, b;
+                for (int k = 0; k < filtro.length; k++) {
+                    for (int l = 0; l < filtro.length; l++) {
+                       
+                    }
+                }
+
+            }
+        }
+
         return procesada;
     }
 

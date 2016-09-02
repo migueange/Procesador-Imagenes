@@ -95,6 +95,8 @@ public class Controles extends HBox {
                     break;
                 case "Mosaico":
                     restringeTextFields(valorn = new TextField("10"), valorm = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    valorm.setPrefWidth(75);
                     Label labeln = new Label("Valor de n:  "),
                      labelm = new Label("Valor de m: ");
                     VBox contenedorTextFields = new VBox(new HBox(labeln, valorn), new HBox(labelm, valorm));
@@ -127,7 +129,7 @@ public class Controles extends HBox {
         procesar = new Button("Procesar");
         procesar.setOnAction((ActionEvent event) -> {
             if (imagen == null) {
-                Mensajes.muestraError("Por favor cargue una imagen", "");
+                Mensajes.muestraError("Por favor cargue una imagen", "Puede seleccionar cualquier imagen formato jpg\no png.");
                 return;
             }
             if (selectorFiltro.getValue() == null) {
