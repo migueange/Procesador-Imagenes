@@ -95,10 +95,11 @@ public class Controles extends HBox {
                     break;
                 case "Mosaico":
                     restringeTextFields(valorn = new TextField("10"), valorm = new TextField("10"));
-                    Label labeln = new Label("Valor de n: "),
+                    Label labeln = new Label("Valor de n:  "),
                      labelm = new Label("Valor de m: ");
                     VBox contenedorTextFields = new VBox(new HBox(labeln, valorn), new HBox(labelm, valorm));
                     contenedorTextFields.setAlignment(Pos.CENTER);
+                    contenedorTextFields.setSpacing(5);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorTextFields);
                     break;
             }
@@ -153,11 +154,11 @@ public class Controles extends HBox {
                         int n = Integer.parseInt(valorn.getText());
                         int m = Integer.parseInt(valorm.getText());
                         if (n > temp.getHeight() || m > temp.getWidth()) {
-                            Mensajes.muestraError("Error en los valores", "Los valores de n y m no deben\nexceder la altura y el ancho de la imagen respectivamente.");
+                            Mensajes.muestraError("Error en los valores", "Los valores de n y m no deben exceder la altura\ny el ancho de la imagen respectivamente.");
                             return;
                         }
                         if(n <= 0 || m <= 0){
-                            Mensajes.muestraError("Error en los valores", "Los valores de n y m\ndeben ser mayores que cero.");
+                            Mensajes.muestraError("Error en los valores", "Los valores de n y m deben ser mayores que cero.");
                             return;
                         }
                         contenedorImagenes.setImagenProcesada(Filtros.mosaico(imagen, n, m), imagen);
