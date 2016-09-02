@@ -108,7 +108,7 @@ public class Filtros {
     }
 
     /**
-     * Crea una "mica" del color que inidiquen los valores rgb
+     * Crea una "mica" del color que inidiquen los valores rgb dados.
      *
      * @param img
      * @param r
@@ -131,6 +131,8 @@ public class Filtros {
     }
 
     /**
+     * Filtro mosaico, toma submatrices de nxm y colorea esa región de la imagen
+     * con el promedio de los colores de cada submatriz.
      *
      * @param img
      * @param n
@@ -140,23 +142,24 @@ public class Filtros {
     public static BufferedImage mosaico(File img, int n, int m) throws IOException {
         BufferedImage original = ImageIO.read(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int r = 0, g = 0, b = 0;
+        /* Recorrer bloques de nxm */
         for (int i = 0; i < original.getHeight(); i += m) {
             for (int j = 0; j < original.getWidth(); j += n) {
-                int r = 0;
-                int g = 0;
-                int b = 0;
+                /*Promedio por bloque*/
+                r = g = b = 0;
                 for (int k = i; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++) {
                     for (int l = j; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++) {
-                        //System.out.print(String.format("  [%d][%d] ",l,k));
                         Color color = new Color(original.getRGB(l, k));
                         r += color.getRed();
                         g += color.getGreen();
                         b += color.getBlue();
                     }
                 }
+                /*Pintar bloque con el promedio*/
                 for (int k = i; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++) {
                     for (int l = j; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++) {
-                        procesada.setRGB(l, k, new Color(r / (n * m), b / (n * m), g / (n * m)).getRGB());
+                        procesada.setRGB(l, k, new Color(r / (n * m), g / (n * m), b / (n * m)).getRGB());
                     }
                 }
             }

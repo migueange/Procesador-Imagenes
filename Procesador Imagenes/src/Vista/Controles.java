@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -32,6 +33,7 @@ public class Controles extends HBox {
     private final FileChooser fileChooser;
     private File imagen;
     private Slider sliderR, sliderG, sliderB;
+    private TextField valorn, valorm;
 
     /**
      *
@@ -90,7 +92,15 @@ public class Controles extends HBox {
                     VBox contenedorSliders = new VBox(new HBox(new Label("R: "), sliderR, R), new HBox(new Label("G: "), sliderG, G), new HBox(new Label("B: "), sliderB, B));
                     contenedorSliders.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliders);
-                    break;               
+                    break;
+                case "Mosaico":
+                    restringeTextFields(valorn = new TextField("10"), valorm = new TextField("10"));
+                    Label labeln = new Label("Valor de n: "),
+                     labelm = new Label("Valor de m: ");
+                    VBox contenedorTextFields = new VBox(new HBox(labeln, valorn), new HBox(labelm, valorm));
+                    contenedorTextFields.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorTextFields);
+                    break;
             }
         });
         /*Selector de archivo*/
@@ -115,21 +125,21 @@ public class Controles extends HBox {
         /*Empezar proceso*/
         procesar = new Button("Procesar");
         procesar.setOnAction((ActionEvent event) -> {
-            if(imagen == null){
-                Mensajes.muestraError("Por favor cargue una imagen","");
+            if (imagen == null) {
+                Mensajes.muestraError("Por favor cargue una imagen", "");
                 return;
             }
-            if(selectorFiltro.getValue() == null){
+            if (selectorFiltro.getValue() == null) {
                 Mensajes.muestraError("Por favor seleccione un filtro", "");
                 return;
             }
             try {
                 switch (selectorFiltro.getValue().toString()) {
-                    case "Tonos de grises por promedio":                                                    
+                    case "Tonos de grises por promedio":
                         contenedorImagenes.setImagenProcesada(Filtros.tonosDeGrisesPorPromedio(imagen), imagen);
                         break;
                     case "Tonos de grises por color":
-                        if(selectorColor.getValue() == null){
+                        if (selectorColor.getValue() == null) {
                             Mensajes.muestraError("Por favor seleccione un color", "");
                             return;
                         }
@@ -139,16 +149,27 @@ public class Controles extends HBox {
                         contenedorImagenes.setImagenProcesada(Filtros.tonosDeGrisesPorPorcentaje(imagen), imagen);
                         break;
                     case "Mosaico":
-                        contenedorImagenes.setImagenProcesada(Filtros.mosaico(imagen,5,10), imagen);
+                        BufferedImage temp = ImageIO.read(imagen);
+                        int n = Integer.parseInt(valorn.getText());
+                        int m = Integer.parseInt(valorm.getText());
+                        if (n > temp.getHeight() || m > temp.getWidth()) {
+                            Mensajes.muestraError("Error en los valores", "Los valores de n y m no deben\nexceder la altura y el ancho de la imagen respectivamente.");
+                            return;
+                        }
+                        if(n <= 0 || m <= 0){
+                            Mensajes.muestraError("Error en los valores", "Los valores de n y m\ndeben ser mayores que cero.");
+                            return;
+                        }
+                        contenedorImagenes.setImagenProcesada(Filtros.mosaico(imagen, n, m), imagen);
                         break;
                     case "Red, Green or Blue":
-                        if(selectorColor.getValue() == null){
+                        if (selectorColor.getValue() == null) {
                             Mensajes.muestraError("Por favor seleccione un color", "");
                             return;
                         }
                         contenedorImagenes.setImagenProcesada(Filtros.colorDominante(imagen, selectorColor.getValue().toString()), imagen);
                         break;
-                    case "Micas":                        
+                    case "Micas":
                         contenedorImagenes.setImagenProcesada(Filtros.micas(imagen, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue()), imagen);
                         break;
                 }
@@ -169,6 +190,28 @@ public class Controles extends HBox {
         /*Propiedades HBox controles*/
         super.getChildren().addAll(botonesIzquierda, opciones, botonesDerecha);
         super.setPrefSize(950, 100);
+    }
+
+    /**
+     * Restringe los textFields para que solo se puedan ingresar números.
+     *
+     * @param tf
+     */
+    private void restringeTextFields(TextField... tf) {
+        for (TextField t : tf) {
+            t.setOnKeyReleased((event) -> {
+                String str = t.getText();
+                String aux = "";
+                for (int i = 0; i < str.length(); i++) {
+                    if (str.charAt(i) >= '0' && str.charAt(i) <= '9') {
+                        aux += str.charAt(i);
+                    } else {
+                        t.setText(aux);
+                        t.positionCaret(aux.length());
+                    }
+                }
+            });
+        }
     }
 
 }
