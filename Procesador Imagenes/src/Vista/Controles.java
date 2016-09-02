@@ -119,7 +119,7 @@ public class Controles extends HBox {
                     BufferedImage copia = original.getSubimage(0, 0, original.getWidth(), original.getHeight());
                     contenedorImagenes.setImagenProcesada(copia, imagen);
                 } catch (Exception ioe) {
-                    System.err.println(ioe.getMessage());
+                    Mensajes.muestraError("Error al cargar la imagen", "Por favor intentelo de nuevo.");
                 }
             }
         });
@@ -157,7 +157,7 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "Los valores de n y m no deben exceder la altura\ny el ancho de la imagen respectivamente.");
                             return;
                         }
-                        if(n <= 0 || m <= 0){
+                        if (n <= 0 || m <= 0) {
                             Mensajes.muestraError("Error en los valores", "Los valores de n y m deben ser mayores que cero.");
                             return;
                         }
@@ -176,7 +176,7 @@ public class Controles extends HBox {
                 }
 
             } catch (IOException ioe) {
-                Mensajes.muestraError("Hubo un error en el proceso", "Intentelo de nuevo");
+                Mensajes.muestraError("Hubo un error en el proceso", "Por favor, intentelo de nuevo");
             }
         }
         );
