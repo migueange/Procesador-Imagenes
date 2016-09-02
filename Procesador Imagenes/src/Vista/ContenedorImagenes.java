@@ -35,6 +35,7 @@ public class ContenedorImagenes extends HBox {
         der.setPrefSize(475, 400);
         super.setPrefSize(950, 400);
         super.getChildren().addAll(izq, der);
+        super.setSpacing(2);
         super.setStyle("-fx-background-color: #DCDCDC;");
     }
 
