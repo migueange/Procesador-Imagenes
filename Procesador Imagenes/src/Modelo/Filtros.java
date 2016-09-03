@@ -58,6 +58,27 @@ public class Filtros {
     }
 
     /**
+     * Convierte la imagen a tonos de grises con la siguiente fórmula. gris =
+     * (R*0.3)+(G*0.59)+(B*0.11)
+     *
+     * @param original
+     * @return
+     * @throws IOException
+     */
+    private static BufferedImage tonosDeGrisesPorPorcentaje(BufferedImage original) throws IOException {
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int gris = (int) ((color.getRed() * 0.3) + (color.getGreen() * .59) + color.getBlue() * .11);
+                Color rgbGris = new Color(gris, gris, gris);
+                procesada.setRGB(j, i, rgbGris.getRGB());
+            }
+        }
+        return procesada;
+    }
+
+    /**
      * Convierte la imagen tomando el valor del color seleccionado.
      *
      * @param img
@@ -173,6 +194,7 @@ public class Filtros {
      * **************************************************************
      */
     /**
+     * Aplica un blur a través de una convolución, utiliza un filtro de 5x5.
      *
      * @param img
      * @return
@@ -190,6 +212,155 @@ public class Filtros {
     }
 
     /**
+     * Aplica un motion blur a través de una convolución, utiliza un filtro de
+     * 9x9.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage motionBlur(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {1, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 1, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 1, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0 / 9.0, 0);
+    }
+
+    /**
+     * Encuentra bordes verticales
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesVerticales(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {0, 0, -1, 0, 0},
+            {0, 0, -1, 0, 0},
+            {0, 0, 4, 0, 0},
+            {0, 0, -1, 0, 0},
+            {0, 0, -1, 0, 0}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Encuentra bordes horizontales
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesHorizontales(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {0, 0, -1, 0, 0},
+            {0, 0, -1, 0, 0},
+            {0, 0, 2, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Encuentra bordes diagonales.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesDiagonales(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, 0, 0, 0, 0},
+            {0, -2, 0, 0, 0},
+            {0, 0, 6, 0, 0},
+            {0, 0, 0, -2, 0},
+            {0, 0, 0, 0, -1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Encuentra bordes en todas las direcciones (Verticales, horizontales y
+     * diagonales).
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesTodasDirecciones(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, -1, -1},
+            {-1, 8, -1},
+            {-1, -1, -1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Filtro sharpen mostrando bordes excesivos.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage sharpen(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, -1, -1},
+            {-1, 9, -1},
+            {-1, -1, -1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Realza el relieve de una imagen.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage emboss(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, -1, 0},
+            {-1, 0, 1},
+            {0, 1, 1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 128);
+    }
+
+    /**
+     * Aumenta o disminuye el brillo de una imagen.
+     * @param img
+     * @param brillo
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage brillo(File img, int brillo) throws IOException {
+        BufferedImage original = ImageIO.read(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int r = ((color.getRed() + brillo) > 255) ? 255 : ((color.getRed() + brillo) < 0) ? 0 : color.getRed() + brillo;
+                int g = ((color.getGreen() + brillo) > 255) ? 255 : ((color.getGreen() + brillo) < 0) ? 0 : color.getGreen() + brillo;
+                int b = ((color.getBlue() + brillo) > 255) ? 255 : ((color.getBlue() + brillo) < 0) ? 0 : color.getBlue() + brillo;
+                procesada.setRGB(j, i, new Color(r,g,b).getRGB());
+            }
+        }
+        return procesada;
+    }
+
+    /**
+     * Algoritmo para convolución, aplica cualquier filtro de nxn.
      *
      * @param img
      * @param filtro

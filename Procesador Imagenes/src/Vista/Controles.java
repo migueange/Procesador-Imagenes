@@ -57,7 +57,15 @@ public class Controles extends HBox {
                 "Mosaico",
                 "Red, Green or Blue",
                 "Micas",
-                "Blur"
+                "Blur",
+                "Motion Blur",
+                "Encontrar Bordes Verticales",
+                "Encontrar Bordes Horizontales",
+                "Encontrar Bordes Diagonales",
+                "Encontrar Bordes en todas las direcciones",
+                "Sharpen",
+                "Emboss",
+                "Brillo"
         ));
         selectorFiltro.setPromptText("Seleccionar filtro");
         selectorFiltro.setOnAction(event -> {
@@ -104,6 +112,17 @@ public class Controles extends HBox {
                     contenedorTextFields.setAlignment(Pos.CENTER);
                     contenedorTextFields.setSpacing(5);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorTextFields);
+                    break;
+                case "Brillo":
+                    Label brilloL = new Label("0  ");
+                    sliderB = new Slider(-255, 255, 0);
+                    sliderB.setPrefWidth(250);
+                    sliderB.valueProperty().addListener((ov, oldvalue, newvalue) -> {
+                        brilloL.setText(newvalue.intValue() + "");
+                    });                    
+                    VBox contenedorSliderBrillo = new VBox(new HBox(new Label("Brillo: "),sliderB,brilloL));
+                    contenedorSliderBrillo.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "),contenedorSliderBrillo);
                     break;
             }
         });
@@ -179,6 +198,31 @@ public class Controles extends HBox {
                     case "Blur":
                         contenedorImagenes.setImagenProcesada(Filtros.blur(imagen), imagen);
                         break;
+                    case "Motion Blur":
+                        contenedorImagenes.setImagenProcesada(Filtros.motionBlur(imagen), imagen);
+                        break;
+                    case "Encontrar Bordes Verticales":
+                        contenedorImagenes.setImagenProcesada(Filtros.encontrarBordesVerticales(imagen), imagen);
+                        break;
+                    case "Encontrar Bordes Horizontales":
+                        contenedorImagenes.setImagenProcesada(Filtros.encontrarBordesHorizontales(imagen), imagen);
+                        break;
+                    case "Encontrar Bordes Diagonales":
+                        contenedorImagenes.setImagenProcesada(Filtros.encontrarBordesDiagonales(imagen), imagen);
+                        break;
+                    case "Encontrar Bordes en todas las direcciones":
+                        contenedorImagenes.setImagenProcesada(Filtros.encontrarBordesTodasDirecciones(imagen), imagen);
+                        break;
+                    case "Sharpen":
+                        contenedorImagenes.setImagenProcesada(Filtros.sharpen(imagen), imagen);
+                        break;
+                    case "Emboss":
+                        contenedorImagenes.setImagenProcesada(Filtros.emboss(imagen), imagen);
+                        break;
+                    case "Brillo":
+                        contenedorImagenes.setImagenProcesada(Filtros.brillo(imagen,(int)sliderB.getValue()), imagen);
+                        break;
+
                 }
 
             } catch (IOException ioe) {
