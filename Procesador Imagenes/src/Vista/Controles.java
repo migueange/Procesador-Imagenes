@@ -65,7 +65,9 @@ public class Controles extends HBox {
                 "Encontrar Bordes en todas las direcciones",
                 "Sharpen",
                 "Emboss",
-                "Brillo"
+                "Brillo",
+                "Alto Contraste",
+                "Inverso"
         ));
         selectorFiltro.setPromptText("Seleccionar filtro");
         selectorFiltro.setOnAction(event -> {
@@ -222,7 +224,12 @@ public class Controles extends HBox {
                     case "Brillo":
                         contenedorImagenes.setImagenProcesada(Filtros.brillo(imagen,(int)sliderB.getValue()), imagen);
                         break;
-
+                    case "Alto Contraste":
+                        contenedorImagenes.setImagenProcesada(Filtros.altoContraste(imagen), imagen);
+                        break;
+                    case "Inverso":
+                        contenedorImagenes.setImagenProcesada(Filtros.inverso(imagen), imagen);
+                        break;
                 }
 
             } catch (IOException ioe) {

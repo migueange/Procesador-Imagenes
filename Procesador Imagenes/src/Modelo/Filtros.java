@@ -58,27 +58,6 @@ public class Filtros {
     }
 
     /**
-     * Convierte la imagen a tonos de grises con la siguiente fórmula. gris =
-     * (R*0.3)+(G*0.59)+(B*0.11)
-     *
-     * @param original
-     * @return
-     * @throws IOException
-     */
-    private static BufferedImage tonosDeGrisesPorPorcentaje(BufferedImage original) throws IOException {
-        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < original.getHeight(); i++) {
-            for (int j = 0; j < original.getWidth(); j++) {
-                Color color = new Color(original.getRGB(j, i));
-                int gris = (int) ((color.getRed() * 0.3) + (color.getGreen() * .59) + color.getBlue() * .11);
-                Color rgbGris = new Color(gris, gris, gris);
-                procesada.setRGB(j, i, rgbGris.getRGB());
-            }
-        }
-        return procesada;
-    }
-
-    /**
      * Convierte la imagen tomando el valor del color seleccionado.
      *
      * @param img
@@ -339,6 +318,7 @@ public class Filtros {
 
     /**
      * Aumenta o disminuye el brillo de una imagen.
+     *
      * @param img
      * @param brillo
      * @return
@@ -353,7 +333,58 @@ public class Filtros {
                 int r = ((color.getRed() + brillo) > 255) ? 255 : ((color.getRed() + brillo) < 0) ? 0 : color.getRed() + brillo;
                 int g = ((color.getGreen() + brillo) > 255) ? 255 : ((color.getGreen() + brillo) < 0) ? 0 : color.getGreen() + brillo;
                 int b = ((color.getBlue() + brillo) > 255) ? 255 : ((color.getBlue() + brillo) < 0) ? 0 : color.getBlue() + brillo;
-                procesada.setRGB(j, i, new Color(r,g,b).getRGB());
+                procesada.setRGB(j, i, new Color(r, g, b).getRGB());
+            }
+        }
+        return procesada;
+    }
+
+    /**
+     * Filtro de alto contraste.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage altoContraste(File img) throws IOException {
+        BufferedImage original = tonosDeGrisesPorPorcentaje(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int r = (int) (color.getRed() * 255);
+                int g = (int) (color.getGreen() * 255);
+                int b = (int) (color.getBlue() * 255);
+                if (((r + g + b) / 3) > 127) {
+                    procesada.setRGB(j, i, new Color(255, 255, 255).getRGB());
+                } else {
+                    procesada.setRGB(j, i, new Color(0, 0, 0).getRGB());
+                }
+            }
+        }
+        return procesada;
+    }
+    
+    /**
+     * 
+     * @param img
+     * @return
+     * @throws IOException 
+     */
+    public static BufferedImage inverso(File img) throws IOException{
+        BufferedImage original = tonosDeGrisesPorPorcentaje(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int r = (int) (color.getRed() * 255);
+                int g = (int) (color.getGreen() * 255);
+                int b = (int) (color.getBlue() * 255);
+                if (((r + g + b) / 3) <= 127) {
+                    procesada.setRGB(j, i, new Color(255, 255, 255).getRGB());
+                } else {
+                    procesada.setRGB(j, i, new Color(0, 0, 0).getRGB());
+                }
             }
         }
         return procesada;
