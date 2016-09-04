@@ -82,9 +82,13 @@ public class Controles extends HBox {
                     opciones.getChildren().addAll(new Label("Opciones: "), selectorColor);
                     break;
                 case "Micas":
-                    Label R = new Label("0  "),
-                     G = new Label("0  "),
-                     B = new Label("0  ");
+                    Label R = new Label("0  "),RL = new Label("R: "), G = new Label("0  "),GL = new Label("G: "), B = new Label("0  "), BL = new Label("B: ");
+                    R.setStyle("-fx-text-fill: red;");
+                    RL.setStyle("-fx-text-fill: red;");
+                    G.setStyle("-fx-text-fill: green;");
+                    GL.setStyle("-fx-text-fill: green;");
+                    B.setStyle("-fx-text-fill: blue;");
+                    BL.setStyle("-fx-text-fill: blue;");
                     sliderR = new Slider(0, 255, 0);
                     sliderR.setPrefWidth(250);
                     sliderR.valueProperty().addListener((ov, oldvalue, newvalue) -> {
@@ -100,7 +104,7 @@ public class Controles extends HBox {
                     sliderB.valueProperty().addListener((ov, oldvalue, newvalue) -> {
                         B.setText(newvalue.intValue() + "");
                     });
-                    VBox contenedorSliders = new VBox(new HBox(new Label("R: "), sliderR, R), new HBox(new Label("G: "), sliderG, G), new HBox(new Label("B: "), sliderB, B));
+                    VBox contenedorSliders = new VBox(new HBox(RL, sliderR, R), new HBox(GL, sliderG, G), new HBox(BL, sliderB, B));
                     contenedorSliders.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliders);
                     break;
