@@ -173,6 +173,7 @@ public class Filtros {
      * **************************************************************
      */
     /**
+     * Aplica un blur a través de una convolución, utiliza un filtro de 5x5.
      *
      * @param img
      * @return
@@ -190,6 +191,207 @@ public class Filtros {
     }
 
     /**
+     * Aplica un motion blur a través de una convolución, utiliza un filtro de
+     * 9x9.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage motionBlur(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {1, 0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 1, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 1, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 1, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 1, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 1, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0, 1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0 / 9.0, 0);
+    }
+
+    /**
+     * Encuentra bordes verticales
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesVerticales(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {0, 0, -1, 0, 0},
+            {0, 0, -1, 0, 0},
+            {0, 0, 4, 0, 0},
+            {0, 0, -1, 0, 0},
+            {0, 0, -1, 0, 0}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Encuentra bordes horizontales
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesHorizontales(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {0, 0, -1, 0, 0},
+            {0, 0, -1, 0, 0},
+            {0, 0, 2, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Encuentra bordes diagonales.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesDiagonales(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, 0, 0, 0, 0},
+            {0, -2, 0, 0, 0},
+            {0, 0, 6, 0, 0},
+            {0, 0, 0, -2, 0},
+            {0, 0, 0, 0, -1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Encuentra bordes en todas las direcciones (Verticales, horizontales y
+     * diagonales).
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage encontrarBordesTodasDirecciones(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, -1, -1},
+            {-1, 8, -1},
+            {-1, -1, -1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Filtro sharpen mostrando bordes excesivos.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage sharpen(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, -1, -1},
+            {-1, 9, -1},
+            {-1, -1, -1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 0);
+    }
+
+    /**
+     * Realza el relieve de una imagen.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage emboss(File img) throws IOException {
+        double[][] filtro = new double[][]{
+            {-1, -1, 0},
+            {-1, 0, 1},
+            {0, 1, 1}
+        };
+        return aplicaConvolucion(img, filtro, 1.0, 128);
+    }
+
+    /**
+     * Aumenta o disminuye el brillo de una imagen.
+     *
+     * @param img
+     * @param brillo
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage brillo(File img, int brillo) throws IOException {
+        BufferedImage original = ImageIO.read(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int r = ((color.getRed() + brillo) > 255) ? 255 : ((color.getRed() + brillo) < 0) ? 0 : color.getRed() + brillo;
+                int g = ((color.getGreen() + brillo) > 255) ? 255 : ((color.getGreen() + brillo) < 0) ? 0 : color.getGreen() + brillo;
+                int b = ((color.getBlue() + brillo) > 255) ? 255 : ((color.getBlue() + brillo) < 0) ? 0 : color.getBlue() + brillo;
+                procesada.setRGB(j, i, new Color(r, g, b).getRGB());
+            }
+        }
+        return procesada;
+    }
+
+    /**
+     * Filtro de alto contraste.
+     *
+     * @param img
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage altoContraste(File img) throws IOException {
+        BufferedImage original = tonosDeGrisesPorPorcentaje(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int r = (int) (color.getRed() * 255);
+                int g = (int) (color.getGreen() * 255);
+                int b = (int) (color.getBlue() * 255);
+                if (((r + g + b) / 3) > 127) {
+                    procesada.setRGB(j, i, new Color(255, 255, 255).getRGB());
+                } else {
+                    procesada.setRGB(j, i, new Color(0, 0, 0).getRGB());
+                }
+            }
+        }
+        return procesada;
+    }
+    
+    /**
+     * 
+     * @param img
+     * @return
+     * @throws IOException 
+     */
+    public static BufferedImage inverso(File img) throws IOException{
+        BufferedImage original = tonosDeGrisesPorPorcentaje(img);
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int r = (int) (color.getRed() * 255);
+                int g = (int) (color.getGreen() * 255);
+                int b = (int) (color.getBlue() * 255);
+                if (((r + g + b) / 3) <= 127) {
+                    procesada.setRGB(j, i, new Color(255, 255, 255).getRGB());
+                } else {
+                    procesada.setRGB(j, i, new Color(0, 0, 0).getRGB());
+                }
+            }
+        }
+        return procesada;
+    }
+
+    /**
+     * Algoritmo para convolución, aplica cualquier filtro de nxn.
      *
      * @param img
      * @param filtro

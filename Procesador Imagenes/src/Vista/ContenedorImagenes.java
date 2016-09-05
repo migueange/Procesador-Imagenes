@@ -68,17 +68,16 @@ public class ContenedorImagenes extends HBox {
     public void setImagenProcesada(BufferedImage is, File img) throws IOException {
         if (!der.getChildren().isEmpty()) {
             der.getChildren().remove(0);
-        }
+        }        
         der.setAlignment(Pos.CENTER);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(is, img.getName().substring(img.getName().lastIndexOf(".") + 1), os);
-        Image aux = SwingFXUtils.toFXImage(is, null);
-        if (aux.getWidth() > aux.getHeight()) {
-            procesada = new Image(new ByteArrayInputStream(os.toByteArray()), 475,  (aux.getHeight() * ((100 * 475) / aux.getWidth())) / 100, false, false);
-        } else if (aux.getHeight() == aux.getWidth()) {
+        if (is.getWidth() > is.getHeight()) {            
+            procesada = new Image(new ByteArrayInputStream(os.toByteArray()), 475,  (is.getHeight() * ((100 * 475) / is.getWidth())) / 100, false, false);
+        } else if (is.getHeight() == is.getWidth()) {
             procesada = new Image(new ByteArrayInputStream(os.toByteArray()), 380, 380, false, false);
         } else {
-            procesada = new Image(new ByteArrayInputStream(os.toByteArray()), (aux.getWidth() * ((100 * 380) / aux.getHeight())) / 100, 380, false, false);
+            procesada = new Image(new ByteArrayInputStream(os.toByteArray()), (is.getWidth() * ((100 * 380) / is.getHeight())) / 100, 380, false, false);
         }
         der.getChildren().add(new ImageView(procesada));
     }
