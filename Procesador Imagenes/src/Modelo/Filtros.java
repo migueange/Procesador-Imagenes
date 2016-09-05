@@ -200,7 +200,6 @@ public class Filtros {
     private static BufferedImage aplicaConvolucion(File img, double[][] filtro, double factor, double bias) throws IOException {
         BufferedImage original = ImageIO.read(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-
         for (int i = 0; i < original.getHeight(); i++) {
             for (int j = 0; j < original.getWidth(); j++) {
                 double r = 0, g = 0, b = 0;
