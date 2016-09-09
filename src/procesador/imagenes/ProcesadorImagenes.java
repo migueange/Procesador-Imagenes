@@ -22,7 +22,7 @@ public class ProcesadorImagenes extends Application {
     
     @Override
     public void start(Stage primaryStage) {               
-        Scene scene = new Scene(new Contenedor(primaryStage), 950, 600);        
+        Scene scene = new Scene(new Contenedor(primaryStage), 950, 500);        
         primaryStage.setResizable(false);
         primaryStage.setTitle("Procesador Imágenes");
         primaryStage.setScene(scene);
