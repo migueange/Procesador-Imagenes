@@ -17,7 +17,7 @@ Blur
 Motion Blur
 Bordes
 Sharpen
-Emboss
+Embos
 
 
 
