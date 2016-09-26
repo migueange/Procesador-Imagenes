@@ -68,7 +68,8 @@ public class Controles extends HBox {
                 "Brillo",
                 "Alto Contraste",
                 "Inverso",
-                "Imagenes Recursivas Colores Reales"
+                "Imagenes Recursivas Colores Reales",
+                "Imagenes Recursivas Tonos de Grises"
         ));
         selectorFiltro.setPromptText("Seleccionar filtro");
         selectorFiltro.setOnAction(event -> {
@@ -139,7 +140,16 @@ public class Controles extends HBox {
                 case "Imagenes Recursivas Colores Reales":
                     restringeTextFields(valorn = new TextField("10"));
                     valorn.setPrefWidth(75);
-                    opciones.getChildren().addAll(new Label("Opciones: "), new Label("Anchura de cada subimagen:  "), valorn);
+                    HBox contenedor1 = new HBox(new Label("Anchura de cada subimagen:  "), valorn);
+                    contenedor1.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedor1);
+                    break;
+                case "Imagenes Recursivas Tonos de Grises":
+                    restringeTextFields(valorn = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    HBox contenedor2 = new HBox(new Label("Anchura de cada subimagen:  "), valorn);
+                    contenedor2.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedor2);
                     break;
             }
         });
@@ -173,9 +183,9 @@ public class Controles extends HBox {
                 Mensajes.muestraError("Por favor seleccione un filtro", "");
                 return;
             }
-            int n,m;
+            int n, m;
             BufferedImage temp;
-            
+
             try {
                 switch (selectorFiltro.getValue().toString()) {
                     case "Tonos de grises por promedio":
@@ -251,7 +261,7 @@ public class Controles extends HBox {
                     case "Imagenes Recursivas Colores Reales":
                         temp = ImageIO.read(imagen);
                         n = Integer.parseInt(valorn.getText());
-                        m = new Double((temp.getHeight() * n) / temp.getWidth()).intValue();                        
+                        m = new Double((temp.getHeight() * n) / temp.getWidth()).intValue();
                         if (n > temp.getWidth() || m > temp.getHeight()) {
                             Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
                             return;
@@ -260,7 +270,21 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
-                        contenedorImagenes.setImagenProcesada(Filtros.imagenesRecursivasColorReal(imagen, n,m), imagen);
+                        contenedorImagenes.setImagenProcesada(Filtros.imagenesRecursivasColorReal(imagen, n, m), imagen);
+                        break;
+                    case "Imagenes Recursivas Tonos de Grises":
+                        temp = ImageIO.read(imagen);
+                        n = Integer.parseInt(valorn.getText());
+                        m = new Double((temp.getHeight() * n) / temp.getWidth()).intValue();
+                        if (n > temp.getWidth() || m > temp.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        contenedorImagenes.setImagenProcesada(Filtros.imagenesRecursivasTonosGris(imagen, n, m), imagen);
                         break;
                 }
 

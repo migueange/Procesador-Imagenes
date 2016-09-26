@@ -24,7 +24,7 @@ public class Contenedor extends VBox{
         contenedorImagenes = new ContenedorImagenes();
         controles = new Controles(stage,contenedorImagenes);
         super.getChildren().addAll(titulos,contenedorImagenes,controles);
-        super.setPrefSize(950, 625);
+        super.setPrefSize(950, 500);
     }
     
 }
