@@ -1,9 +1,11 @@
 package Modelo;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 /**
@@ -130,6 +132,19 @@ public class Filtros {
         return procesada;
     }
 
+    /*Aplica una mica a una imagen*/
+    private static BufferedImage micas(BufferedImage original, int r, int g, int b) throws IOException {
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Color colorMica = new Color(r, g, b);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                procesada.setRGB(j, i, colorMica.getRGB() & color.getRGB());
+            }
+        }
+        return procesada;
+    }
+
     /**
      * Filtro mosaico, toma submatrices de nxm y colorea esa región de la imagen
      * con el promedio de los colores de cada submatriz.
@@ -168,10 +183,7 @@ public class Filtros {
         return procesada;
     }
 
-    /**
-     * ***************************************************** Convolucion
-     * **************************************************************
-     */
+    //******************************************************* Convolucion****************************************************************
     /**
      * Aplica un blur a través de una convolución, utiliza un filtro de 5x5.
      *
@@ -339,6 +351,21 @@ public class Filtros {
         return procesada;
     }
 
+    /* Da el brillo a una imagen */
+    private static BufferedImage brillo(BufferedImage original, int brillo) throws IOException {
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                int r = ((color.getRed() + brillo) > 255) ? 255 : ((color.getRed() + brillo) < 0) ? 0 : color.getRed() + brillo;
+                int g = ((color.getGreen() + brillo) > 255) ? 255 : ((color.getGreen() + brillo) < 0) ? 0 : color.getGreen() + brillo;
+                int b = ((color.getBlue() + brillo) > 255) ? 255 : ((color.getBlue() + brillo) < 0) ? 0 : color.getBlue() + brillo;
+                procesada.setRGB(j, i, new Color(r, g, b).getRGB());
+            }
+        }
+        return procesada;
+    }
+
     /**
      * Filtro de alto contraste.
      *
@@ -364,14 +391,14 @@ public class Filtros {
         }
         return procesada;
     }
-    
+
     /**
-     * 
+     *
      * @param img
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
-    public static BufferedImage inverso(File img) throws IOException{
+    public static BufferedImage inverso(File img) throws IOException {
         BufferedImage original = tonosDeGrisesPorPorcentaje(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < original.getHeight(); i++) {
@@ -420,6 +447,133 @@ public class Filtros {
             }
         }
         return procesada;
+    }
+
+    //******************************************************* Imágenes recursivas ****************************************************************
+    /**
+     * Genera una imagen hecha de la misma imagen con tonos reales. Este método
+     * no crea imágenes en disco duro y solo usa las imágenes necesarias sin
+     * repetirlas.
+     *
+     * @param img
+     * @param n
+     * @param m
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage imagenesRecursivasColorReal(File img, int n, int m) throws IOException {
+        /*La imagen original*/
+        BufferedImage original = ImageIO.read(img);
+        /*Imagen que contendrá el mosaico recursivo*/
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        /*Valores para el promedio por región*/
+        int r, g, b;
+        /*Un Diccionario que nos ayudará a hacer más eficiente el proceso, reutilizando subimagenes.*/
+ /*Su llave será el entero RGB que representa a cada color, por lo cual es único, su valor es una*/
+ /*imagen mas pequeña y única.*/
+        HashMap<Integer, BufferedImage> subImagenes = new HashMap<>();
+        /* Recorrer bloques de nxm */
+        for (int i = 0; i < original.getHeight(); i += m) {
+            for (int j = 0; j < original.getWidth(); j += n) {
+                /*Promedio por bloque*/
+                r = g = b = 0;
+                for (int k = i; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++) {
+                    for (int l = j; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++) {
+                        Color color = new Color(original.getRGB(l, k));
+                        r += color.getRed();
+                        g += color.getGreen();
+                        b += color.getBlue();
+                    }
+                }
+                /*Pintar cada subimagen dado el promedio de la región, hacemos esto aplicando una mica a cada subimagen*/
+                Color colorMica = new Color(r / (n * m), g / (n * m), b / (n * m));
+                /*Si no existe la imagen con la mica dado el promedio de color de la región, se crea.*/
+                if (!subImagenes.containsKey(colorMica.getRGB())) {
+                    subImagenes.put(colorMica.getRGB(), getSubImagenColorReal(original, colorMica.getRed(), colorMica.getGreen(), colorMica.getBlue(), n, m));
+                }
+                /*Una vez obtenida la subimagen con la mica especifica, pintamos esa región de la original con la subimagen.*/
+                BufferedImage subImagen = subImagenes.get(colorMica.getRGB());
+                for (int k = i, i1 = 0; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++, i1++) {
+                    for (int l = j, j1 = 0; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++, j1++) {
+                        procesada.setRGB(l, k, subImagen.getRGB(j1, i1));
+                    }
+                }
+            }
+        }
+        return procesada;
+    }
+
+    /*Obtiene una imagen igual a la original pero más pequeña en colores reales.*/
+    private static BufferedImage getSubImagenColorReal(BufferedImage original, int r, int g, int b, int n, int m) throws IOException {
+        BufferedImage subImagen = new BufferedImage(n, m, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = subImagen.createGraphics();
+        graphics.drawImage(original, 0, 0, n, m, null);
+        graphics.dispose();
+        return micas(subImagen, r, g, b);
+    }
+
+    /**
+     * Genera una imagen hecha de la misma imagen en tonos de grises. Este
+     * método no crea imágenes en disco duro y solo usa las imágenes necesarias
+     * sin repetirlas.
+     *
+     * @param img
+     * @param n
+     * @param m
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage imagenesRecursivasTonosGris(File img, int n, int m) throws IOException {
+        /*La imagen original*/
+        BufferedImage original = tonosDeGrisesPorPorcentaje(img);
+        /*Imagen que contendrá el mosaico recursivo*/
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        /*Valores para el promedio por región*/
+        int r, g, b;
+        /*Un Diccionario que nos ayudará a hacer más eficiente el proceso, reutilizando subimagenes.
+          Su llave será el entero RGB que representa a cada color, por lo cual es único, su valor es una
+          imagen mas pequeña que la origina y única.*/
+        HashMap<Integer, BufferedImage> subImagenes = new HashMap<>();
+        /* Recorrer bloques de nxm */
+        for (int i = 0; i < original.getHeight(); i += m) {
+            for (int j = 0; j < original.getWidth(); j += n) {
+                /*Promedio por bloque*/
+                r = g = b = 0;
+                for (int k = i; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++) {
+                    for (int l = j; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++) {
+                        Color color = new Color(original.getRGB(l, k));
+                        r += color.getRed();
+                        g += color.getGreen();
+                        b += color.getBlue();
+                    }
+                }
+                /*Pintar cada subimagen dado el promedio de la región, hacemos esto aplicando una mica a cada subimagen*/
+                Color colorPromedio = new Color(r / (n * m), g / (n * m), b / (n * m));
+                /*Calculamos el promedio de todos los colores para obtener una constante que será el brillo */
+                int brillo = ((r + g + b) / (n * m)) / 3;
+                /*Si no existe la imagen con la mica dado el promedio de color de la región, se crea.*/
+                if (!subImagenes.containsKey(colorPromedio.getRGB())) {
+                    subImagenes.put(colorPromedio.getRGB(), getSubImagenTonosGrises(original, brillo, n, m));
+                }
+                /*Una vez obtenida la subimagen con la mica especifica, pintamos esa región de la original con la subimagen.*/
+                BufferedImage subImagen = subImagenes.get(colorPromedio.getRGB());
+                for (int k = i, i1 = 0; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++, i1++) {
+                    for (int l = j, j1 = 0; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++, j1++) {
+                        procesada.setRGB(l, k, subImagen.getRGB(j1, i1));
+                    }
+                }
+            }
+        }
+        return procesada;
+    }
+
+    /*Obtiene una imagen igual a la original pero más pequeña en tonos de grises.*/
+    private static BufferedImage getSubImagenTonosGrises(BufferedImage original, int brillo, int n, int m) throws IOException {
+        BufferedImage subImagen = new BufferedImage(n, m, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = subImagen.createGraphics();
+        graphics.drawImage(original, 0, 0, n, m, null);
+        graphics.dispose();
+        return brillo(subImagen, brillo);
     }
 
 }
