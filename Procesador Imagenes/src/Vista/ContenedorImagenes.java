@@ -5,7 +5,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -15,6 +14,7 @@ import javax.imageio.ImageIO;
 
 /**
  * Contiene las imagenes, original y procesada
+ *
  * @author miguel
  */
 public class ContenedorImagenes extends HBox {
@@ -29,18 +29,19 @@ public class ContenedorImagenes extends HBox {
         super();
         /*Contenedor imagen original*/
         izq = new StackPane();
-        izq.setPrefSize(475, 400);
+        izq.setPrefSize(475, 475);
         /*contenedor imagen procesada*/
         der = new StackPane();
-        der.setPrefSize(475, 400);
-        super.setPrefSize(950, 400);
+        der.setPrefSize(475, 475);
+        super.setPrefSize(950, 475);
         super.getChildren().addAll(izq, der);
         super.setSpacing(2);
         super.setStyle("-fx-background-color: #DCDCDC;");
     }
 
     /**
-     * 
+     * Muestra la imagen original en la interfaz.
+     *
      * @param img
      */
     public void setImagenOriginal(File img) {
@@ -49,17 +50,13 @@ public class ContenedorImagenes extends HBox {
         }
         izq.setAlignment(Pos.CENTER);
         Image aux = new Image("file:///" + img.getAbsolutePath().replace("\\", "/"));
-        if (aux.getWidth() > aux.getHeight()) {
-            original = new Image("file:///" + img.getAbsolutePath().replace("\\", "/"), 475, (aux.getHeight() * ((100 * 475) / aux.getWidth())) / 100, false, false);
-        } else if (aux.getHeight() == aux.getWidth()) {
-            original = new Image("file:///" + img.getAbsolutePath().replace("\\", "/"), 380, 380, false, false);
-        } else {
-            original = new Image("file:///" + img.getAbsolutePath().replace("\\", "/"), (aux.getWidth() * ((100 * 380) / aux.getHeight())) / 100, 380, false, false);
-        }
-        izq.getChildren().add(new ImageView(original));
+        double[] medidas = calculaMedidasImagen(aux.getWidth(), aux.getHeight());
+        izq.getChildren().add(new ImageView(original = new Image("file:///" + img.getAbsolutePath().replace("\\", "/"), medidas[0], medidas[1], false, false)));
     }
 
     /**
+     * Muestra la imagen en la interfaz después de aplicarle algún filtro o
+     * proceso a la imagen original.
      *
      * @param is
      * @param img
@@ -68,18 +65,23 @@ public class ContenedorImagenes extends HBox {
     public void setImagenProcesada(BufferedImage is, File img) throws IOException {
         if (!der.getChildren().isEmpty()) {
             der.getChildren().remove(0);
-        }        
+        }
         der.setAlignment(Pos.CENTER);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(is, img.getName().substring(img.getName().lastIndexOf(".") + 1), os);
-        if (is.getWidth() > is.getHeight()) {            
-            procesada = new Image(new ByteArrayInputStream(os.toByteArray()), 475,  (is.getHeight() * ((100 * 475) / is.getWidth())) / 100, false, false);
-        } else if (is.getHeight() == is.getWidth()) {
-            procesada = new Image(new ByteArrayInputStream(os.toByteArray()), 380, 380, false, false);
-        } else {
-            procesada = new Image(new ByteArrayInputStream(os.toByteArray()), (is.getWidth() * ((100 * 380) / is.getHeight())) / 100, 380, false, false);
+        double[] medidas = calculaMedidasImagen(is.getWidth(), is.getHeight());
+        der.getChildren().add(new ImageView(procesada = new Image(new ByteArrayInputStream(os.toByteArray()), medidas[0], medidas[1], false, false)));
+    }
+
+    /*Calcula las medidas para mostrar las imágenes en la interfaz*/
+    private double[] calculaMedidasImagen(double originalWidth, double originalHeight) {
+        if (originalWidth > originalHeight) {
+            return new double[]{475, (originalHeight * ((100 * 475) / originalWidth)) / 100};
         }
-        der.getChildren().add(new ImageView(procesada));
+        if (originalHeight == originalWidth) {
+            return new double[]{475, 475};
+        }
+        return new double[]{(originalWidth * ((100 * 475) / originalHeight)) / 100, 475};
     }
 
 }

@@ -67,7 +67,8 @@ public class Controles extends HBox {
                 "Emboss",
                 "Brillo",
                 "Alto Contraste",
-                "Inverso"
+                "Inverso",
+                "Imagenes Recursivas Colores Reales"
         ));
         selectorFiltro.setPromptText("Seleccionar filtro");
         selectorFiltro.setOnAction(event -> {
@@ -82,7 +83,12 @@ public class Controles extends HBox {
                     opciones.getChildren().addAll(new Label("Opciones: "), selectorColor);
                     break;
                 case "Micas":
-                    Label R = new Label("0  "),RL = new Label("R: "), G = new Label("0  "),GL = new Label("G: "), B = new Label("0  "), BL = new Label("B: ");
+                    Label R = new Label("0  "),
+                     RL = new Label("R: "),
+                     G = new Label("0  "),
+                     GL = new Label("G: "),
+                     B = new Label("0  "),
+                     BL = new Label("B: ");
                     R.setStyle("-fx-text-fill: red;");
                     RL.setStyle("-fx-text-fill: red;");
                     G.setStyle("-fx-text-fill: green;");
@@ -125,10 +131,15 @@ public class Controles extends HBox {
                     sliderB.setPrefWidth(250);
                     sliderB.valueProperty().addListener((ov, oldvalue, newvalue) -> {
                         brilloL.setText(newvalue.intValue() + "");
-                    });                    
-                    VBox contenedorSliderBrillo = new VBox(new HBox(new Label("Brillo: "),sliderB,brilloL));
+                    });
+                    VBox contenedorSliderBrillo = new VBox(new HBox(new Label("Brillo: "), sliderB, brilloL));
                     contenedorSliderBrillo.setAlignment(Pos.CENTER);
-                    opciones.getChildren().addAll(new Label("Opciones: "),contenedorSliderBrillo);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliderBrillo);
+                    break;
+                case "Imagenes Recursivas Colores Reales":
+                    restringeTextFields(valorn = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    opciones.getChildren().addAll(new Label("Opciones: "), new Label("Anchura de cada subimagen:  "), valorn);
                     break;
             }
         });
@@ -162,6 +173,9 @@ public class Controles extends HBox {
                 Mensajes.muestraError("Por favor seleccione un filtro", "");
                 return;
             }
+            int n,m;
+            BufferedImage temp;
+            
             try {
                 switch (selectorFiltro.getValue().toString()) {
                     case "Tonos de grises por promedio":
@@ -178,9 +192,9 @@ public class Controles extends HBox {
                         contenedorImagenes.setImagenProcesada(Filtros.tonosDeGrisesPorPorcentaje(imagen), imagen);
                         break;
                     case "Mosaico":
-                        BufferedImage temp = ImageIO.read(imagen);
-                        int n = Integer.parseInt(valorn.getText());
-                        int m = Integer.parseInt(valorm.getText());
+                        temp = ImageIO.read(imagen);
+                        n = Integer.parseInt(valorn.getText());
+                        m = Integer.parseInt(valorm.getText());
                         if (n > temp.getHeight() || m > temp.getWidth()) {
                             Mensajes.muestraError("Error en los valores", "Los valores de n y m no deben exceder la altura\ny el ancho de la imagen respectivamente.");
                             return;
@@ -226,13 +240,27 @@ public class Controles extends HBox {
                         contenedorImagenes.setImagenProcesada(Filtros.emboss(imagen), imagen);
                         break;
                     case "Brillo":
-                        contenedorImagenes.setImagenProcesada(Filtros.brillo(imagen,(int)sliderB.getValue()), imagen);
+                        contenedorImagenes.setImagenProcesada(Filtros.brillo(imagen, (int) sliderB.getValue()), imagen);
                         break;
                     case "Alto Contraste":
                         contenedorImagenes.setImagenProcesada(Filtros.altoContraste(imagen), imagen);
                         break;
                     case "Inverso":
                         contenedorImagenes.setImagenProcesada(Filtros.inverso(imagen), imagen);
+                        break;
+                    case "Imagenes Recursivas Colores Reales":
+                        temp = ImageIO.read(imagen);
+                        n = Integer.parseInt(valorn.getText());
+                        m = new Double((temp.getHeight() * n) / temp.getWidth()).intValue();                        
+                        if (n > temp.getWidth() || m > temp.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        contenedorImagenes.setImagenProcesada(Filtros.imagenesRecursivasColorReal(imagen, n,m), imagen);
                         break;
                 }
 

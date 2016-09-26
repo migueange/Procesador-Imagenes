@@ -1,9 +1,11 @@
 package Modelo;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 /**
@@ -168,10 +170,7 @@ public class Filtros {
         return procesada;
     }
 
-    /**
-     * ***************************************************** Convolucion
-     * **************************************************************
-     */
+    //******************************************************* Convolucion****************************************************************
     /**
      * Aplica un blur a través de una convolución, utiliza un filtro de 5x5.
      *
@@ -364,14 +363,14 @@ public class Filtros {
         }
         return procesada;
     }
-    
+
     /**
-     * 
+     *
      * @param img
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
-    public static BufferedImage inverso(File img) throws IOException{
+    public static BufferedImage inverso(File img) throws IOException {
         BufferedImage original = tonosDeGrisesPorPorcentaje(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < original.getHeight(); i++) {
@@ -402,7 +401,6 @@ public class Filtros {
     private static BufferedImage aplicaConvolucion(File img, double[][] filtro, double factor, double bias) throws IOException {
         BufferedImage original = ImageIO.read(img);
         BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-
         for (int i = 0; i < original.getHeight(); i++) {
             for (int j = 0; j < original.getWidth(); j++) {
                 double r = 0, g = 0, b = 0;
@@ -418,6 +416,81 @@ public class Filtros {
                 g = Math.min(Math.max(factor * g + bias, 0), 255);
                 b = Math.min(Math.max(factor * b + bias, 0), 255);
                 procesada.setRGB(j, i, new Color((int) r, (int) g, (int) b).getRGB());
+            }
+        }
+        return procesada;
+    }
+
+    //******************************************************* Imágenes recursivas ****************************************************************
+    
+    /**
+     * 
+     *
+     * @param img
+     * @param n
+     * @return
+     * @throws IOException
+     */
+    public static BufferedImage imagenesRecursivasColorReal(File img, int n,int m) throws IOException {
+        /*La imagen original*/
+        BufferedImage original = ImageIO.read(img);
+        /*Imagen que contendrá el mosaico recursivo*/
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        /*Valores para el promedio por región*/
+        int r, g, b;
+        /*Un Diccionario que nos ayudará a hacer más eficiente el proceso, reutilizando subimagenes.*/
+        /*Su llave será el entero RGB que representa a cada color, por lo cual es único, su valor es una*/
+        /*imagen mas pequeña y única.*/
+        HashMap<Integer, BufferedImage> subImagenes = new HashMap<>();
+        /* Recorrer bloques de nxm */
+        for (int i = 0; i < original.getHeight(); i += m) {
+            for (int j = 0; j < original.getWidth(); j += n) {
+                /*Promedio por bloque*/
+                r = g = b = 0;
+                for (int k = i; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++) {
+                    for (int l = j; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++) {
+                        Color color = new Color(original.getRGB(l, k));
+                        r += color.getRed();
+                        g += color.getGreen();
+                        b += color.getBlue();
+                    }
+                }
+                /*Pintar cada subimagen dado el promedio de la región, hacemos esto aplicando una mica a cada subimagen*/
+                Color colorMica = new Color(r / (n * m), g / (n * m), b / (n * m));
+                /*Si no existe la imagen con la mica dado el promedio de color de la región, se crea.*/
+                if (!subImagenes.containsKey(colorMica.getRGB())) {
+                    subImagenes.put(colorMica.getRGB(), getSubImagen(original, colorMica.getRed(), colorMica.getGreen(), colorMica.getBlue(),n,m));
+                }
+                /*Una vez obtenida la subimagen con la mica especifica, pintamos esa región de la original con la subimagen.*/
+                BufferedImage subImagen = subImagenes.get(colorMica.getRGB());
+                for (int k = i,i1=0; k < ((i + m < original.getHeight()) ? i + m : original.getHeight()); k++,i1++) {
+                    for (int l = j,j1=0; l < ((j + n < original.getWidth()) ? j + n : original.getWidth()); l++,j1++) {                        
+                        procesada.setRGB(l, k, subImagen.getRGB(j1, i1));
+                    }
+                }
+            }
+        }
+        return procesada;
+    }
+    
+    /*Obtiene una imagen igual a la original pero más pequeña.*/
+    private static BufferedImage getSubImagen(BufferedImage original, int r, int g, int b,int n,int m) throws IOException {               
+        BufferedImage subImagen = new BufferedImage(n,m, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = subImagen.createGraphics();
+        graphics.drawImage(original, 0, 0, n, m, null);
+        graphics.dispose();
+        return micas(subImagen, r, g, b);
+    }
+    
+    
+    /*Aplica una mica a una imagen*/
+    private static BufferedImage micas(BufferedImage original, int r, int g, int b) throws IOException {        
+        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Color colorMica = new Color(r, g, b);
+        for (int i = 0; i < original.getHeight(); i++) {
+            for (int j = 0; j < original.getWidth(); j++) {
+                Color color = new Color(original.getRGB(j, i));
+                procesada.setRGB(j, i, colorMica.getRGB() & color.getRGB());
             }
         }
         return procesada;
