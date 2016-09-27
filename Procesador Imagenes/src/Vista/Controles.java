@@ -4,12 +4,16 @@ import Modelo.Filtros;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -34,6 +38,9 @@ public class Controles extends HBox {
     private File imagen;
     private Slider sliderR, sliderG, sliderB;
     private TextField valorn, valorm;
+    private ProgressIndicator progressIndicator;
+    private Task task;
+    private StackPane contenedorOpciones;
 
     /**
      *
@@ -47,6 +54,12 @@ public class Controles extends HBox {
         opciones.setPrefSize(500, 100);
         opciones.setAlignment(Pos.CENTER);
         opciones.setSpacing(50);
+        /*Progress indicator*/
+        progressIndicator = new ProgressIndicator(0);
+        progressIndicator.setVisible(false);
+        /*Contenedor de porgreso y opciones*/
+        contenedorOpciones = new StackPane(opciones, progressIndicator);
+        contenedorOpciones.setAlignment(Pos.CENTER);
         /*ChoiceBox para escoger filtro*/
         selectorColor = new ComboBox(FXCollections.observableArrayList("Red", "Green", "Blue"));
         selectorColor.setPromptText("Seleccionar color");
@@ -184,8 +197,9 @@ public class Controles extends HBox {
                 return;
             }
             int n, m;
-            BufferedImage temp;
-
+            BufferedImage temp, original, procesada;
+            progressIndicator.setVisible(true);
+            opciones.setVisible(false);
             try {
                 switch (selectorFiltro.getValue().toString()) {
                     case "Tonos de grises por promedio":
@@ -270,7 +284,27 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
-                        contenedorImagenes.setImagenProcesada(Filtros.imagenesRecursivasColorReal(imagen, n, m), imagen);
+                        original = ImageIO.read(imagen);
+                        procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+                        Task task = new Task() {
+                            @Override
+                            protected Object call() throws Exception {
+                                Filtros.imagenesRecursivasColorReal(original, procesada, n, m);
+                                return true;
+                            }
+                        };
+                        task.setOnSucceeded(e -> {
+                            progressIndicator.setVisible(false);
+                            opciones.setVisible(true);
+                            try {
+                                contenedorImagenes.setImagenProcesada(procesada, imagen);
+                            } catch (IOException ex) {
+                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
+                            }
+                        });
+                        progressIndicator.progressProperty().unbind();
+                        progressIndicator.progressProperty().bind(task.progressProperty());
+                        new Thread(task).start();
                         break;
                     case "Imagenes Recursivas Tonos de Grises":
                         temp = ImageIO.read(imagen);
@@ -291,8 +325,7 @@ public class Controles extends HBox {
             } catch (IOException ioe) {
                 Mensajes.muestraError("Hubo un error en el proceso", "Por favor, intentelo de nuevo");
             }
-        }
-        );
+        });
         /*Contenedores*/
         StackPane botonesDerecha = new StackPane(procesar);
         botonesDerecha.setPrefSize(225, 100);
@@ -302,7 +335,7 @@ public class Controles extends HBox {
         botonesIzquierda.setAlignment(Pos.CENTER);
         botonesIzquierda.setSpacing(10);
         /*Propiedades HBox controles*/
-        super.getChildren().addAll(botonesIzquierda, opciones, botonesDerecha);
+        super.getChildren().addAll(botonesIzquierda, contenedorOpciones, botonesDerecha);
         super.setPrefSize(950, 100);
     }
 

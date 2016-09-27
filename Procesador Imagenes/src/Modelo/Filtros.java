@@ -461,16 +461,16 @@ public class Filtros {
      * @return
      * @throws IOException
      */
-    public static BufferedImage imagenesRecursivasColorReal(File img, int n, int m) throws IOException {
+    public static BufferedImage imagenesRecursivasColorReal(BufferedImage original,BufferedImage procesada, int n, int m) throws IOException {
         /*La imagen original*/
-        BufferedImage original = ImageIO.read(img);
+        //BufferedImage original = ImageIO.read(img);
         /*Imagen que contendrá el mosaico recursivo*/
-        BufferedImage procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+        
         /*Valores para el promedio por región*/
         int r, g, b;
-        /*Un Diccionario que nos ayudará a hacer más eficiente el proceso, reutilizando subimagenes.*/
- /*Su llave será el entero RGB que representa a cada color, por lo cual es único, su valor es una*/
- /*imagen mas pequeña y única.*/
+        /*Un Diccionario que nos ayudará a hacer más eficiente el proceso, reutilizando subimagenes.
+          Su llave será el entero RGB que representa a cada color, por lo cual es único, su valor es una
+          imagen mas pequeña y única.*/
         HashMap<Integer, BufferedImage> subImagenes = new HashMap<>();
         /* Recorrer bloques de nxm */
         for (int i = 0; i < original.getHeight(); i += m) {
