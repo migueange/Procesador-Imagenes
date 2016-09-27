@@ -20,7 +20,6 @@ Sharpen
 Embos
 
 
-
 El comprimido contiene una carpeta con un proyecto en netbeans 8.1 con el código fuente, 
 un ejecutable ProcesadorImagenes.jar y un README.
 
