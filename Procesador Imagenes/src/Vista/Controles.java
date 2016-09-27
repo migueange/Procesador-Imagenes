@@ -286,13 +286,7 @@ public class Controles extends HBox {
                         }
                         original = ImageIO.read(imagen);
                         procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-                        Task task = new Task() {
-                            @Override
-                            protected Object call() throws Exception {
-                                Filtros.imagenesRecursivasColorReal(original, procesada, n, m);
-                                return true;
-                            }
-                        };
+                        Task task = Filtros.imagenesRecursivasColorReal(original, procesada, n, m);              
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
