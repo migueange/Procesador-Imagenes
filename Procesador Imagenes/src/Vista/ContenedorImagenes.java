@@ -20,7 +20,7 @@ import javax.imageio.ImageIO;
 public class ContenedorImagenes extends HBox {
 
     private final StackPane izq, der;
-    private Image original, procesada;
+    public Image original, procesada, procesadaReal;
 
     /**
      *
@@ -71,6 +71,7 @@ public class ContenedorImagenes extends HBox {
         ImageIO.write(is, img.getName().substring(img.getName().lastIndexOf(".") + 1), os);
         double[] medidas = calculaMedidasImagen(is.getWidth(), is.getHeight());
         der.getChildren().add(new ImageView(procesada = new Image(new ByteArrayInputStream(os.toByteArray()), medidas[0], medidas[1], false, false)));
+        procesadaReal = new Image(new ByteArrayInputStream(os.toByteArray()), is.getWidth(), is.getHeight(), false, false);
     }
 
     /*Calcula las medidas para mostrar las imágenes en la interfaz*/
