@@ -190,8 +190,8 @@ public class Controles extends HBox {
         guardarImagen = new Button("Guardar");
         guardarImagen.setDisable(true);
         guardarImagen.setOnAction(event -> {
-            fileChooser.setInitialFileName("ejemplo."+ imagen.getName().substring(imagen.getName().lastIndexOf(".") + 1));
-            File archivoNuevo = fileChooser.showSaveDialog(stage);            
+            fileChooser.setInitialFileName("ejemplo." + imagen.getName().substring(imagen.getName().lastIndexOf(".") + 1));
+            File archivoNuevo = fileChooser.showSaveDialog(stage);
             if (archivoNuevo != null) {
                 try {
                     ImageIO.write(SwingFXUtils.fromFXImage(contenedorImagenes.procesadaReal, null), imagen.getName().substring(imagen.getName().lastIndexOf(".") + 1), archivoNuevo);
@@ -214,21 +214,20 @@ public class Controles extends HBox {
             }
             int n, m;
             final BufferedImage temp, original, procesada;
-            progressIndicator.setVisible(true);
-            opciones.setVisible(false);    
-            guardarImagen.setDisable(false);
-            procesar.setDisable(true);
             try {
                 original = ImageIO.read(imagen);
-                System.out.println(original.getWidth()+"x"+original.getHeight());
                 procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-                System.out.println(procesada.getWidth()+"x"+procesada.getHeight());
                 switch (selectorFiltro.getValue().toString()) {
                     case "Tonos de grises por promedio":
                         task = Filtros.tonosDeGrisesPorPromedio(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
-                            opciones.setVisible(true);                            
+                            opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -245,9 +244,14 @@ public class Controles extends HBox {
                             return;
                         }
                         task = Filtros.tonosDeGrisesPorColor(original, procesada, selectorColor.getValue().toString());
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -260,9 +264,14 @@ public class Controles extends HBox {
                         return;
                     case "Tonos de grises por porcentaje":
                         task = Filtros.tonosDeGrisesPorPorcentaje(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -286,9 +295,14 @@ public class Controles extends HBox {
                             return;
                         }
                         task = Filtros.mosaico(original, procesada, n, m);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -305,9 +319,14 @@ public class Controles extends HBox {
                             return;
                         }
                         task = Filtros.colorDominante(original, procesada, selectorColor.getValue().toString());
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -320,9 +339,14 @@ public class Controles extends HBox {
                         return;
                     case "Micas":
                         task = Filtros.micas(original, procesada, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue());
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -335,9 +359,14 @@ public class Controles extends HBox {
                         return;
                     case "Blur":
                         task = Filtros.blur(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -353,9 +382,14 @@ public class Controles extends HBox {
                         return;
                     case "Motion Blur":
                         task = Filtros.motionBlur(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -368,9 +402,14 @@ public class Controles extends HBox {
                         return;
                     case "Encontrar Bordes Verticales":
                         task = Filtros.encontrarBordesVerticales(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -383,9 +422,14 @@ public class Controles extends HBox {
                         return;
                     case "Encontrar Bordes Horizontales":
                         task = Filtros.encontrarBordesHorizontales(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -398,9 +442,14 @@ public class Controles extends HBox {
                         return;
                     case "Encontrar Bordes Diagonales":
                         task = Filtros.encontrarBordesDiagonales(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -413,9 +462,14 @@ public class Controles extends HBox {
                         return;
                     case "Encontrar Bordes en todas las direcciones":
                         task = Filtros.encontrarBordesTodasDirecciones(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -428,9 +482,14 @@ public class Controles extends HBox {
                         return;
                     case "Sharpen":
                         task = Filtros.sharpen(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -443,9 +502,14 @@ public class Controles extends HBox {
                         return;
                     case "Emboss":
                         task = Filtros.emboss(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -458,9 +522,14 @@ public class Controles extends HBox {
                         return;
                     case "Brillo":
                         task = Filtros.brillo(original, procesada, (int) sliderB.getValue());
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -473,9 +542,14 @@ public class Controles extends HBox {
                         return;
                     case "Alto Contraste":
                         task = Filtros.altoContraste(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -488,9 +562,14 @@ public class Controles extends HBox {
                         return;
                     case "Inverso":
                         task = Filtros.inverso(original, procesada);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
+                            procesar.setDisable(false);
                             try {
                                 contenedorImagenes.setImagenProcesada(procesada, imagen);
                             } catch (IOException ex) {
@@ -513,6 +592,10 @@ public class Controles extends HBox {
                             return;
                         }
                         task = Filtros.imagenesRecursivasColorReal(original, procesada, n, m);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
@@ -539,6 +622,10 @@ public class Controles extends HBox {
                             return;
                         }
                         task = Filtros.imagenesRecursivasTonosGris(original, procesada, n, m);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
                         task.setOnSucceeded(e -> {
                             progressIndicator.setVisible(false);
                             opciones.setVisible(true);
@@ -553,14 +640,14 @@ public class Controles extends HBox {
                         progressIndicator.progressProperty().bind(task.progressProperty());
                         new Thread(task).start();
                         return;
-                }                
+                }
             } catch (IOException ioe) {
                 Mensajes.muestraError("Hubo un error en el proceso", "Por favor, intentelo de nuevo");
             }
-            
+
         });
         /*Contenedores*/
-        VBox botonesDerecha = new VBox(procesar,guardarImagen);
+        VBox botonesDerecha = new VBox(procesar, guardarImagen);
         botonesDerecha.setPrefSize(225, 100);
         botonesDerecha.setAlignment(Pos.CENTER);
         botonesDerecha.setSpacing(10);
