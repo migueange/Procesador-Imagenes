@@ -4,10 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.HashMap;
 import javafx.concurrent.Task;
-import org.apache.commons.io.FileUtils;
 
 /**
  * Contiene filtros para las imágenes.
