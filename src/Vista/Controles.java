@@ -1,6 +1,7 @@
 package Vista;
 
 import Modelo.Filtros;
+import Acciones.Acciones;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -64,27 +65,8 @@ public class Controles extends HBox {
         /*ChoiceBox para escoger filtro*/
         selectorColor = new ComboBox(FXCollections.observableArrayList("Red", "Green", "Blue"));
         selectorColor.setPromptText("Seleccionar color");
-        selectorFiltro = new ComboBox(FXCollections.observableArrayList(
-                "Tonos de grises por promedio",
-                "Tonos de grises por color",
-                "Tonos de grises por porcentaje",
-                "Mosaico",
-                "Red, Green or Blue",
-                "Micas",
-                "Blur",
-                "Motion Blur",
-                "Encontrar Bordes Verticales",
-                "Encontrar Bordes Horizontales",
-                "Encontrar Bordes Diagonales",
-                "Encontrar Bordes en todas las direcciones",
-                "Sharpen",
-                "Emboss",
-                "Brillo",
-                "Alto Contraste",
-                "Inverso",
-                "Imagenes Recursivas Colores Reales",
-                "Imagenes Recursivas Tonos de Grises"
-        ));
+        /*ChoiceBox seleccionar Filtro*/
+        selectorFiltro = new ComboBox(Acciones.getNombresFiltros());
         selectorFiltro.setPromptText("Seleccionar filtro");
         selectorFiltro.setOnAction(event -> {
             if (!opciones.getChildren().isEmpty()) {
@@ -130,7 +112,7 @@ public class Controles extends HBox {
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliders);
                     break;
                 case "Mosaico":
-                    restringeTextFields(valorn = new TextField("10"), valorm = new TextField("10"));
+                    Acciones.restringeTextFields(valorn = new TextField("10"), valorm = new TextField("10"));
                     valorn.setPrefWidth(75);
                     valorm.setPrefWidth(75);
                     Label labeln = new Label("Valor de n:  "),
@@ -152,18 +134,45 @@ public class Controles extends HBox {
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliderBrillo);
                     break;
                 case "Imagenes Recursivas Colores Reales":
-                    restringeTextFields(valorn = new TextField("10"));
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
                     valorn.setPrefWidth(75);
                     HBox contenedor1 = new HBox(new Label("Anchura de cada subimagen:  "), valorn);
                     contenedor1.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedor1);
                     break;
                 case "Imagenes Recursivas Tonos de Grises":
-                    restringeTextFields(valorn = new TextField("10"));
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
                     valorn.setPrefWidth(75);
                     HBox contenedor2 = new HBox(new Label("Anchura de cada subimagen:  "), valorn);
                     contenedor2.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedor2);
+                    break;
+                case "Una sola letra (Color)":
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
+                    valorm = new TextField("A");
+                    valorn.setPrefWidth(75);
+                    valorm.setPrefWidth(75);
+                    VBox contenedorTextFields1 = new VBox(new HBox(new Label("Tamaño de Fuente:  "), valorn), new HBox(new Label("Letra: "), valorm));
+                    contenedorTextFields1.setAlignment(Pos.CENTER);
+                    contenedorTextFields1.setSpacing(5);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorTextFields1);
+                    break;
+                case "Una sola letra (Tons de Gris)":
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
+                    valorm = new TextField("A");
+                    valorn.setPrefWidth(75);
+                    valorm.setPrefWidth(75);
+                    VBox contenedorTextFields2 = new VBox(new HBox(new Label("Tamaño de Fuente:  "), valorn), new HBox(new Label("Letra: "), valorm));
+                    contenedorTextFields2.setAlignment(Pos.CENTER);
+                    contenedorTextFields2.setSpacing(5);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorTextFields2);
+                    break;
+                case "Letras en blanco y negro":
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    HBox contenedor3 = new HBox(new Label("Tamaño de fuente:  "), valorn);
+                    contenedor3.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedor3);
                     break;
             }
         });
@@ -640,6 +649,93 @@ public class Controles extends HBox {
                         progressIndicator.progressProperty().bind(task.progressProperty());
                         new Thread(task).start();
                         return;
+                    case "Una sola letra (Color)":
+                        m = n = Integer.parseInt(valorn.getText());
+                        if (n > original.getWidth() || m > original.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        task = Filtros.unaLetraColores(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
+                        task.setOnSucceeded(e -> {
+                            progressIndicator.setVisible(false);
+                            opciones.setVisible(true);
+                            procesar.setDisable(false);
+                            try {
+                                contenedorImagenes.setImagenProcesada(procesada, imagen);
+                            } catch (IOException ex) {
+                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
+                            }
+                        });
+                        progressIndicator.progressProperty().unbind();
+                        progressIndicator.progressProperty().bind(task.progressProperty());
+                        new Thread(task).start();
+                        return;
+                    case "Una sola letra (Tons de Gris)":
+                        m = n = Integer.parseInt(valorn.getText());
+                        if (n > original.getWidth() || m > original.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        task = Filtros.unaLetraTonosGrises(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
+                        task.setOnSucceeded(e -> {
+                            progressIndicator.setVisible(false);
+                            opciones.setVisible(true);
+                            procesar.setDisable(false);
+                            try {
+                                contenedorImagenes.setImagenProcesada(procesada, imagen);
+                            } catch (IOException ex) {
+                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
+                            }
+                        });
+                        progressIndicator.progressProperty().unbind();
+                        progressIndicator.progressProperty().bind(task.progressProperty());
+                        new Thread(task).start();
+                        return;
+                    case "Letras en blanco y negro":
+                        m = n = Integer.parseInt(valorn.getText());
+                        if (n > original.getWidth() || m > original.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        task = Filtros.letrasBlancoYNegro(original, procesada, n, m);
+                        progressIndicator.setVisible(true);
+                        opciones.setVisible(false);
+                        guardarImagen.setDisable(false);
+                        procesar.setDisable(true);
+                        task.setOnSucceeded(e -> {
+                            progressIndicator.setVisible(false);
+                            opciones.setVisible(true);
+                            procesar.setDisable(false);
+                            try {
+                                contenedorImagenes.setImagenProcesada(procesada, imagen);
+                            } catch (IOException ex) {
+                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
+                            }
+                        });
+                        progressIndicator.progressProperty().unbind();
+                        progressIndicator.progressProperty().bind(task.progressProperty());
+                        new Thread(task).start();
+                        return;
                 }
             } catch (IOException ioe) {
                 Mensajes.muestraError("Hubo un error en el proceso", "Por favor, intentelo de nuevo");
@@ -658,28 +754,6 @@ public class Controles extends HBox {
         /*Propiedades HBox controles*/
         super.getChildren().addAll(botonesIzquierda, contenedorOpciones, botonesDerecha);
         super.setPrefSize(950, 100);
-    }
-
-    /**
-     * Restringe los textFields para que solo se puedan ingresar números.
-     *
-     * @param tf
-     */
-    private void restringeTextFields(TextField... tf) {
-        for (TextField t : tf) {
-            t.setOnKeyReleased((event) -> {
-                String str = t.getText();
-                String aux = "";
-                for (int i = 0; i < str.length(); i++) {
-                    if (str.charAt(i) >= '0' && str.charAt(i) <= '9') {
-                        aux += str.charAt(i);
-                    } else {
-                        t.setText(aux);
-                        t.positionCaret(aux.length());
-                    }
-                }
-            });
-        }
     }
 
 }
