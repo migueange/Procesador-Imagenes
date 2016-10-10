@@ -1,16 +1,26 @@
 package Acciones;
 
+import Vista.ContenedorImagenes;
+import Vista.Mensajes;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 
 /**
+ * Modela Algunas acciones de la Vista.
  *
  * @author miguel
  */
 public class Acciones {
-    
-    public static ObservableList getNombresFiltros(){
+
+    public static ObservableList getNombresFiltros() {
         return FXCollections.observableArrayList(
                 "Tonos de grises por promedio",
                 "Tonos de grises por color",
@@ -33,10 +43,13 @@ public class Acciones {
                 "Imagenes Recursivas Tonos de Grises",
                 "Una sola letra (Color)",
                 "Una sola letra (Tons de Gris)",
-                "Letras en blanco y negro"
+                "Letras en blanco y negro",
+                "Colores con texto (Letrero)",
+                "Fotos con fichas de dominó",
+                "Fotos con Naipes"
         );
     }
-    
+
     /**
      * Restringe los textFields para que solo se puedan ingresar números.
      *
@@ -59,5 +72,35 @@ public class Acciones {
         }
     }
     
-    
+    /**
+     * 
+     * @param progressIndicator
+     * @param opciones
+     * @param guardarImagen
+     * @param procesar
+     * @param task
+     * @param contenedorImagenes
+     * @param procesada
+     * @param imagen 
+     */
+    public static void comienzaProceso(ProgressIndicator progressIndicator, HBox opciones, Button guardarImagen, Button procesar, Task task, ContenedorImagenes contenedorImagenes,BufferedImage procesada,File imagen) {
+        progressIndicator.setVisible(true);
+        opciones.setVisible(false);
+        guardarImagen.setDisable(false);
+        procesar.setDisable(true);
+        task.setOnSucceeded(e -> {
+            progressIndicator.setVisible(false);
+            opciones.setVisible(true);
+            procesar.setDisable(false);
+            try {
+                contenedorImagenes.setImagenProcesada(procesada, imagen);
+            } catch (IOException ex) {
+                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
+            }
+        });
+        progressIndicator.progressProperty().unbind();
+        progressIndicator.progressProperty().bind(task.progressProperty());
+        new Thread(task).start();
+    }
+
 }

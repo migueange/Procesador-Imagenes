@@ -1,7 +1,13 @@
 package Vista;
 
-import Modelo.Filtros;
 import Acciones.Acciones;
+import Modelo.FiltrosColores;
+import Modelo.FiltrosConvolucion;
+import Modelo.FiltrosLetras;
+import Modelo.ImagenesRecursivas;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -174,6 +180,30 @@ public class Controles extends HBox {
                     contenedor3.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedor3);
                     break;
+                case "Colores con texto (Letrero)":
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
+                    valorm = new TextField("A");
+                    valorn.setPrefWidth(75);
+                    valorm.setPrefWidth(75);
+                    VBox contenedorTextFields3 = new VBox(new HBox(new Label("Tamaño de Fuente:  "), valorn), new HBox(new Label("Texto: "), valorm));
+                    contenedorTextFields3.setAlignment(Pos.CENTER);
+                    contenedorTextFields3.setSpacing(5);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorTextFields3);
+                    break;
+                case "Fotos con fichas de dominó":
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    HBox contenedor4 = new HBox(new Label("Tamaño de fuente:  "), valorn);
+                    contenedor4.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedor4);
+                    break;
+                case "Fotos con Naipes":
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    HBox contenedor5 = new HBox(new Label("Tamaño de fuente:  "), valorn);
+                    contenedor5.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedor5);
+                    break;
             }
         });
         /*Selector de archivo*/
@@ -228,69 +258,18 @@ public class Controles extends HBox {
                 procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
                 switch (selectorFiltro.getValue().toString()) {
                     case "Tonos de grises por promedio":
-                        task = Filtros.tonosDeGrisesPorPromedio(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosColores.tonosDeGrisesPorPromedio(original, procesada);
+                        break;
                     case "Tonos de grises por color":
                         if (selectorColor.getValue() == null) {
                             Mensajes.muestraError("Por favor seleccione un color", "");
                             return;
                         }
-                        task = Filtros.tonosDeGrisesPorColor(original, procesada, selectorColor.getValue().toString());
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosColores.tonosDeGrisesPorColor(original, procesada, selectorColor.getValue().toString());
+                        break;
                     case "Tonos de grises por porcentaje":
-                        task = Filtros.tonosDeGrisesPorPorcentaje(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosColores.tonosDeGrisesPorPorcentaje(original, procesada);
+                        break;
                     case "Mosaico":
                         temp = ImageIO.read(imagen);
                         n = Integer.parseInt(valorn.getText());
@@ -303,292 +282,51 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "Los valores de n y m deben ser mayores que cero.");
                             return;
                         }
-                        task = Filtros.mosaico(original, procesada, n, m);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosColores.mosaico(original, procesada, n, m);
+                        break;
                     case "Red, Green or Blue":
                         if (selectorColor.getValue() == null) {
                             Mensajes.muestraError("Por favor seleccione un color", "");
                             return;
                         }
-                        task = Filtros.colorDominante(original, procesada, selectorColor.getValue().toString());
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosColores.colorDominante(original, procesada, selectorColor.getValue().toString());
+                        break;
                     case "Micas":
-                        task = Filtros.micas(original, procesada, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue());
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosColores.micas(original, procesada, (int) sliderR.getValue(), (int) sliderG.getValue(), (int) sliderB.getValue());
+                        break;
                     case "Blur":
-                        task = Filtros.blur(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        task.setOnFailed(e -> {
-                            System.out.println("Error");
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.blur(original, procesada);
+                        break;
                     case "Motion Blur":
-                        task = Filtros.motionBlur(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.motionBlur(original, procesada);
+                        break;
                     case "Encontrar Bordes Verticales":
-                        task = Filtros.encontrarBordesVerticales(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.encontrarBordesVerticales(original, procesada);
+                        break;
                     case "Encontrar Bordes Horizontales":
-                        task = Filtros.encontrarBordesHorizontales(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.encontrarBordesHorizontales(original, procesada);
+                        break;
                     case "Encontrar Bordes Diagonales":
-                        task = Filtros.encontrarBordesDiagonales(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.encontrarBordesDiagonales(original, procesada);
+                        break;
                     case "Encontrar Bordes en todas las direcciones":
-                        task = Filtros.encontrarBordesTodasDirecciones(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.encontrarBordesTodasDirecciones(original, procesada);
+                        break;
                     case "Sharpen":
-                        task = Filtros.sharpen(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.sharpen(original, procesada);
+                        break;
                     case "Emboss":
-                        task = Filtros.emboss(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.emboss(original, procesada);
+                        break;
                     case "Brillo":
-                        task = Filtros.brillo(original, procesada, (int) sliderB.getValue());
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.brillo(original, procesada, (int) sliderB.getValue());
+                        break;
                     case "Alto Contraste":
-                        task = Filtros.altoContraste(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.altoContraste(original, procesada);
+                        break;
                     case "Inverso":
-                        task = Filtros.inverso(original, procesada);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosConvolucion.inverso(original, procesada);
+                        break;
                     case "Imagenes Recursivas Colores Reales":
                         n = Integer.parseInt(valorn.getText());
                         m = new Double((original.getHeight() * n) / original.getWidth()).intValue();
@@ -600,25 +338,8 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
-                        task = Filtros.imagenesRecursivasColorReal(original, procesada, n, m);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = ImagenesRecursivas.imagenesRecursivasColorReal(original, procesada, n, m);
+                        break;
                     case "Imagenes Recursivas Tonos de Grises":
                         n = Integer.parseInt(valorn.getText());
                         m = new Double((original.getHeight() * n) / original.getWidth()).intValue();
@@ -630,25 +351,8 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
-                        task = Filtros.imagenesRecursivasTonosGris(original, procesada, n, m);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = ImagenesRecursivas.imagenesRecursivasTonosGris(original, procesada, n, m);
+                        break;
                     case "Una sola letra (Color)":
                         m = n = Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
@@ -659,25 +363,8 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
-                        task = Filtros.unaLetraColores(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosLetras.unaLetraColores(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
+                        break;
                     case "Una sola letra (Tons de Gris)":
                         m = n = Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
@@ -688,25 +375,8 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
-                        task = Filtros.unaLetraTonosGrises(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosLetras.unaLetraTonosGrises(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
+                        break;
                     case "Letras en blanco y negro":
                         m = n = Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
@@ -717,30 +387,56 @@ public class Controles extends HBox {
                             Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
-                        task = Filtros.letrasBlancoYNegro(original, procesada, n, m);
-                        progressIndicator.setVisible(true);
-                        opciones.setVisible(false);
-                        guardarImagen.setDisable(false);
-                        procesar.setDisable(true);
-                        task.setOnSucceeded(e -> {
-                            progressIndicator.setVisible(false);
-                            opciones.setVisible(true);
-                            procesar.setDisable(false);
-                            try {
-                                contenedorImagenes.setImagenProcesada(procesada, imagen);
-                            } catch (IOException ex) {
-                                Mensajes.muestraError("Hubo un error en el proceso", "Por favor vuelva a intentarlo.");
-                            }
-                        });
-                        progressIndicator.progressProperty().unbind();
-                        progressIndicator.progressProperty().bind(task.progressProperty());
-                        new Thread(task).start();
-                        return;
+                        task = FiltrosLetras.letrasBlancoYNegro(original, procesada, n, m);
+                        break;
+                    case "Colores con texto (Letrero)":
+                        m = n = Integer.parseInt(valorn.getText());
+                        if (n > original.getWidth() || m > original.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        task = FiltrosLetras.coloresConTexto(original, procesada, valorm.getText().equals("") ? "ejemplo" : valorm.getText(), n, m);
+                        break;
+                    case "Fotos con fichas de dominó":
+                        /*Cargar la tipografía de dominó*/
+                        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                        ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("Vista/resources/fonts/WhiteDominoes.ttf")));
+                        m = n = Integer.parseInt(valorn.getText()) < 5 ? 5 : Integer.parseInt(valorn.getText());
+                        if (n > original.getWidth() || m > original.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        task = FiltrosLetras.letrasDomino(original, procesada, n, m / 2);
+                        break;
+                    case "Fotos con Naipes":
+                        /*Cargar la tipografía de dominó*/
+                        GraphicsEnvironment gen = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                        gen.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("Vista/resources/fonts/CARDS.TTF")));
+                        m = n = Integer.parseInt(valorn.getText()) < 5 ? 5 : Integer.parseInt(valorn.getText());
+                        if (n > original.getWidth() || m > original.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        task = FiltrosLetras.letrasNaipes(original, procesada, n, m);
+                        break;
                 }
-            } catch (IOException ioe) {
+                Acciones.comienzaProceso(progressIndicator, opciones, guardarImagen, procesar, task, contenedorImagenes, procesada, imagen);
+            } catch (IOException | FontFormatException ioe) {
                 Mensajes.muestraError("Hubo un error en el proceso", "Por favor, intentelo de nuevo");
+                ioe.printStackTrace();
             }
-
         });
         /*Contenedores*/
         VBox botonesDerecha = new VBox(procesar, guardarImagen);
