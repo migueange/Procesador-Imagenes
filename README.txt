@@ -36,6 +36,16 @@ Imágenes recursivas (Tonos de grises)
 Ambos filtros no crean imagenes en disco, las mantienen en memoria y además no crea imágenes inecesarias,
 solo reutilizan las que se requieren para pintar cada región.
 
+Tarea 4
+
+Filtros:
+Una sola letra Color
+Una sola letra BYN
+Letras en Blanco y negro
+Colores con texto
+Dominó
+Naipes
+
 
 El comprimido contiene una carpeta con un proyecto en netbeans 8.1 con el código fuente, 
 un ejecutable ProcesadorImagenes.jar y un README.

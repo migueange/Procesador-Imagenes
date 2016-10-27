@@ -4,6 +4,7 @@ import Acciones.Acciones;
 import Modelo.FiltrosColores;
 import Modelo.FiltrosConvolucion;
 import Modelo.FiltrosLetras;
+import Modelo.FiltrosSemitonosOleosSepia;
 import Modelo.ImagenesRecursivas;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -430,6 +431,18 @@ public class Controles extends HBox {
                             return;
                         }
                         task = FiltrosLetras.letrasNaipes(original, procesada, n, m);
+                        break;
+                    case "Sepia":
+                        task = FiltrosSemitonosOleosSepia.sepia(original, procesada);
+                        break;
+                    case "Óleo":
+                        task = FiltrosSemitonosOleosSepia.oleo(original, procesada);
+                        break;
+                    case "MAX":
+                        task = FiltrosSemitonosOleosSepia.MAX(original, procesada);
+                        break;
+                    case "MIN":
+                        task = FiltrosSemitonosOleosSepia.MIN(original, procesada);
                         break;
                 }
                 Acciones.comienzaProceso(progressIndicator, opciones, guardarImagen, procesar, task, contenedorImagenes, procesada, imagen);

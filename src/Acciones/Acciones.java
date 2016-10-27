@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javax.imageio.ImageIO;
 
 /**
  * Modela Algunas acciones de la Vista.
@@ -46,7 +47,11 @@ public class Acciones {
                 "Letras en blanco y negro",
                 "Colores con texto (Letrero)",
                 "Fotos con fichas de dominó",
-                "Fotos con Naipes"
+                "Fotos con Naipes",
+                "Sepia",
+                "Óleo",
+                "MAX",
+                "MIN"
         );
     }
 
@@ -71,9 +76,9 @@ public class Acciones {
             });
         }
     }
-    
+
     /**
-     * 
+     *
      * @param progressIndicator
      * @param opciones
      * @param guardarImagen
@@ -81,9 +86,9 @@ public class Acciones {
      * @param task
      * @param contenedorImagenes
      * @param procesada
-     * @param imagen 
+     * @param imagen
      */
-    public static void comienzaProceso(ProgressIndicator progressIndicator, HBox opciones, Button guardarImagen, Button procesar, Task task, ContenedorImagenes contenedorImagenes,BufferedImage procesada,File imagen) {
+    public static void comienzaProceso(ProgressIndicator progressIndicator, HBox opciones, Button guardarImagen, Button procesar, Task task, ContenedorImagenes contenedorImagenes, BufferedImage procesada, File imagen) throws IOException {
         progressIndicator.setVisible(true);
         opciones.setVisible(false);
         guardarImagen.setDisable(false);
