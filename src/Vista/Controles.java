@@ -205,6 +205,13 @@ public class Controles extends HBox {
                     contenedor5.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedor5);
                     break;
+                case "Semi-tonos":
+                    Acciones.restringeTextFields(valorn = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    HBox contenedor6 = new HBox(new Label("Tamaño de mosaicos:  "), valorn);
+                    contenedor6.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedor6);
+                    break;
             }
         });
         /*Selector de archivo*/
@@ -357,11 +364,11 @@ public class Controles extends HBox {
                     case "Una sola letra (Color)":
                         m = n = Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño no debe exceder la altura de la imagen.");
                             return;
                         }
                         if (n <= 0 || m <= 0) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
                         task = FiltrosLetras.unaLetraColores(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
@@ -369,11 +376,11 @@ public class Controles extends HBox {
                     case "Una sola letra (Tons de Gris)":
                         m = n = Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño  no debe exceder la altura de la imagen.");
                             return;
                         }
                         if (n <= 0 || m <= 0) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
                         task = FiltrosLetras.unaLetraTonosGrises(original, procesada, valorm.getText().equals("") ? "A" : valorm.getText().charAt(0) + "", n, m);
@@ -381,11 +388,11 @@ public class Controles extends HBox {
                     case "Letras en blanco y negro":
                         m = n = Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño no debe exceder la altura de la imagen.");
                             return;
                         }
                         if (n <= 0 || m <= 0) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
                         task = FiltrosLetras.letrasBlancoYNegro(original, procesada, n, m);
@@ -393,11 +400,11 @@ public class Controles extends HBox {
                     case "Colores con texto (Letrero)":
                         m = n = Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño no debe exceder la altura de la imagen.");
                             return;
                         }
                         if (n <= 0 || m <= 0) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
                         task = FiltrosLetras.coloresConTexto(original, procesada, valorm.getText().equals("") ? "ejemplo" : valorm.getText(), n, m);
@@ -408,11 +415,11 @@ public class Controles extends HBox {
                         ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("Vista/resources/fonts/WhiteDominoes.ttf")));
                         m = n = Integer.parseInt(valorn.getText()) < 5 ? 5 : Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño no debe exceder la altura de la imagen.");
                             return;
                         }
                         if (n <= 0 || m <= 0) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño y la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
                         task = FiltrosLetras.letrasDomino(original, procesada, n, m / 2);
@@ -423,11 +430,11 @@ public class Controles extends HBox {
                         gen.registerFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("Vista/resources/fonts/CARDS.TTF")));
                         m = n = Integer.parseInt(valorn.getText()) < 5 ? 5 : Integer.parseInt(valorn.getText());
                         if (n > original.getWidth() || m > original.getHeight()) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n no debe exceder la altura de la imagen.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño no debe exceder la altura de la imagen.");
                             return;
                         }
                         if (n <= 0 || m <= 0) {
-                            Mensajes.muestraError("Error en los valores", "El valor de n y la altura calculada\na partir de n debe ser mayor que cero.");
+                            Mensajes.muestraError("Error en los valores", "El tamaño la altura calculada\na partir de n debe ser mayor que cero.");
                             return;
                         }
                         task = FiltrosLetras.letrasNaipes(original, procesada, n, m);
@@ -443,6 +450,22 @@ public class Controles extends HBox {
                         break;
                     case "MIN":
                         task = FiltrosSemitonosOleosSepia.MIN(original, procesada);
+                        break;
+                    case "Semi-tonos":
+                        m = n = Integer.parseInt(valorn.getText());
+                        if (n > original.getWidth() || m > original.getHeight()) {
+                            Mensajes.muestraError("Error en los valores", "El tamaño no debe exceder la altura de la imagen.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "El tamaño y la altura calculada\na partir de n debe ser mayor que cero.");
+                            return;
+                        }
+                        BufferedImage[] tonos = new BufferedImage[10];
+                        for (int i = 0; i < tonos.length; i++) {
+                            tonos[i] = ImageIO.read(Controles.class.getResourceAsStream(String.format("resources/img/%d.png", i+1)));
+                        }
+                        task = FiltrosSemitonosOleosSepia.semiTonos(original, procesada, n, m, tonos);
                         break;
                 }
                 Acciones.comienzaProceso(progressIndicator, opciones, guardarImagen, procesar, task, contenedorImagenes, procesada, imagen);

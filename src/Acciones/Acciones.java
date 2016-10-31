@@ -51,7 +51,8 @@ public class Acciones {
                 "Sepia",
                 "Óleo",
                 "MAX",
-                "MIN"
+                "MIN",
+                "Semi-tonos"
         );
     }
 

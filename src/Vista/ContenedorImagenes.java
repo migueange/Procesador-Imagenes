@@ -56,7 +56,7 @@ public class ContenedorImagenes extends HBox {
         Image aux = new Image("file:///" + img.getAbsolutePath().replace("\\", "/"));
         double[] medidas = calculaMedidasImagen(aux.getWidth(), aux.getHeight());
         izq.getChildren().add(new ImageView(original = new Image("file:///" + img.getAbsolutePath().replace("\\", "/"), medidas[0], medidas[1], false, false)));
-        apareceNodo(izq, 1000);
+        apareceNodo(izq, 2000);
     }
 
     /**
@@ -76,7 +76,7 @@ public class ContenedorImagenes extends HBox {
         ImageIO.write(is, img.getName().substring(img.getName().lastIndexOf(".") + 1), os);
         double[] medidas = calculaMedidasImagen(is.getWidth(), is.getHeight());
         der.getChildren().add(new ImageView(procesada = new Image(new ByteArrayInputStream(os.toByteArray()), medidas[0], medidas[1], false, false)));
-        apareceNodo(der, 1000);
+        apareceNodo(der, 2000);
         procesadaReal = new Image(new ByteArrayInputStream(os.toByteArray()), is.getWidth(), is.getHeight(), false, false);
     }
 
