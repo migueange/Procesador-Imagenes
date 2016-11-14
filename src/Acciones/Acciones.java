@@ -12,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import javax.imageio.ImageIO;
 
 /**
  * Modela Algunas acciones de la Vista.
@@ -52,7 +51,11 @@ public class Acciones {
                 "Óleo",
                 "MAX",
                 "MIN",
-                "Semi-tonos"
+                "Semi-tonos",
+                "Blending",
+                "Luz Negra",
+                "Icono",
+                "Quitar marca de agua"
         );
     }
 

@@ -1,6 +1,7 @@
 package Vista;
 
 import Acciones.Acciones;
+import Modelo.FiltrosBlendingMarcaIconosLuzNegra;
 import Modelo.FiltrosColores;
 import Modelo.FiltrosConvolucion;
 import Modelo.FiltrosLetras;
@@ -38,18 +39,19 @@ import javax.imageio.ImageIO;
  */
 public class Controles extends HBox {
 
-    private ComboBox selectorFiltro, selectorColor;
+    private ComboBox selectorFiltro, selectorColor,selectorTamanioIcono;
     private final HBox opciones;
     private final Button procesar;
-    private final Button cargarImagen;
+    private final Button cargarImagen, cargarImagenMezcla;
     private final Button guardarImagen;
     private final FileChooser fileChooser;
-    private File imagen;
+    private File imagen, imagenMezcla;
     private Slider sliderR, sliderG, sliderB;
     private TextField valorn, valorm;
     private ProgressIndicator progressIndicator;
     private Task task;
     private StackPane contenedorOpciones;
+    private BufferedImage mezcla;
 
     /**
      *
@@ -72,6 +74,15 @@ public class Controles extends HBox {
         /*ChoiceBox para escoger filtro*/
         selectorColor = new ComboBox(FXCollections.observableArrayList("Red", "Green", "Blue"));
         selectorColor.setPromptText("Seleccionar color");
+        /*ChoiceBox para escoger tamaño de icono*/
+        selectorTamanioIcono = new ComboBox(FXCollections.observableArrayList("16x16", "24x24", "32x32","48x48","64x64"));
+        selectorTamanioIcono.setPromptText("Seleccionar tamaño");
+        /*Selector de archivo*/
+        fileChooser = new FileChooser();
+        fileChooser.setTitle("Cargar Imagen");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg", "*.png"));
+        /*Cargar imagen mezcla*/
+        cargarImagenMezcla = new Button("Cargar Imagen");
         /*ChoiceBox seleccionar Filtro*/
         selectorFiltro = new ComboBox(Acciones.getNombresFiltros());
         selectorFiltro.setPromptText("Seleccionar filtro");
@@ -212,12 +223,33 @@ public class Controles extends HBox {
                     contenedor6.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedor6);
                     break;
+                case "Blending":
+                    Label valorAlpha = new Label("50%");
+                    sliderR = new Slider(0.0, 1.0, .5);
+                    sliderR.valueProperty().addListener((ov, oldvalue, newvalue) -> {
+                        valorAlpha.setText(new Double((newvalue.doubleValue() * 100)).intValue() + "%");
+                    });
+                    cargarImagenMezcla.setOnAction(e -> {
+                        imagenMezcla = fileChooser.showOpenDialog(stage);
+                        if (imagenMezcla != null) {
+                            try {
+                                mezcla = ImageIO.read(imagenMezcla);;
+                            } catch (Exception ioe) {
+                                Mensajes.muestraError("Error al cargar la imagen", "Por favor intentelo de nuevo.");
+                            }
+                        }
+                    });
+                    VBox contenedorSliderAlpha = new VBox(new HBox(new Label("Alpha: "), sliderR, valorAlpha), cargarImagenMezcla);
+                    contenedorSliderAlpha.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliderAlpha);
+                    break;
+                case "Icono":           
+                    HBox contenedor7 = new HBox(selectorTamanioIcono);
+                    contenedor7.setAlignment(Pos.CENTER);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedor7);
+                    break;
             }
         });
-        /*Selector de archivo*/
-        fileChooser = new FileChooser();
-        fileChooser.setTitle("Cargar Imagen");
-        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg", "*.png"));
         /*Abrir FileChooser*/
         cargarImagen = new Button("Cargar Imagen");
         cargarImagen.setOnAction(event -> {
@@ -263,7 +295,12 @@ public class Controles extends HBox {
             final BufferedImage temp, original, procesada;
             try {
                 original = ImageIO.read(imagen);
-                procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+                if (selectorFiltro.getValue().toString().equals("Icono")) {
+                    int tam = Integer.parseInt(selectorTamanioIcono.getValue().toString().substring(0, 2));
+                    procesada = new BufferedImage(tam, tam, BufferedImage.TYPE_INT_RGB);
+                } else {
+                    procesada = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
+                }
                 switch (selectorFiltro.getValue().toString()) {
                     case "Tonos de grises por promedio":
                         task = FiltrosColores.tonosDeGrisesPorPromedio(original, procesada);
@@ -463,9 +500,25 @@ public class Controles extends HBox {
                         }
                         BufferedImage[] tonos = new BufferedImage[10];
                         for (int i = 0; i < tonos.length; i++) {
-                            tonos[i] = ImageIO.read(Controles.class.getResourceAsStream(String.format("resources/img/%d.png", i+1)));
+                            tonos[i] = ImageIO.read(Controles.class.getResourceAsStream(String.format("resources/img/%d.png", i + 1)));
                         }
                         task = FiltrosSemitonosOleosSepia.semiTonos(original, procesada, n, m, tonos);
+                        break;
+                    case "Blending":
+                        if (mezcla == null) {
+                            Mensajes.muestraError("No se ha cargado la segunda imagen", "Por favor cargue la segunda imagen");
+                            return;
+                        }
+                        task = FiltrosBlendingMarcaIconosLuzNegra.blending(original, mezcla, procesada, sliderR.getValue());
+                        break;
+                    case "Luz Negra":
+                        task = FiltrosBlendingMarcaIconosLuzNegra.luzNegra(original, procesada);
+                        break;
+                    case "Icono":                                               
+                        task = FiltrosBlendingMarcaIconosLuzNegra.icono(original, procesada, Integer.parseInt(selectorTamanioIcono.getValue().toString().substring(0, 2)));
+                        break;
+                    case "Quitar marca de agua":
+                        task = FiltrosBlendingMarcaIconosLuzNegra.quitaMarcaDeAgua(original, procesada);
                         break;
                 }
                 Acciones.comienzaProceso(progressIndicator, opciones, guardarImagen, procesar, task, contenedorImagenes, procesada, imagen);
