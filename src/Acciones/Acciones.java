@@ -55,7 +55,8 @@ public class Acciones {
                 "Blending",
                 "Luz Negra",
                 "Icono",
-                "Quitar marca de agua"
+                "Quitar marca de agua",
+                "Foto Mosaico"  
         );
     }
 

@@ -6,6 +6,7 @@ import Modelo.FiltrosColores;
 import Modelo.FiltrosConvolucion;
 import Modelo.FiltrosLetras;
 import Modelo.FiltrosSemitonosOleosSepia;
+import Modelo.FotoMosaico;
 import Modelo.ImagenesRecursivas;
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -28,6 +29,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -39,20 +41,22 @@ import javax.imageio.ImageIO;
  */
 public class Controles extends HBox {
 
-    private ComboBox selectorFiltro, selectorColor,selectorTamanioIcono;
+    private ComboBox selectorFiltro, selectorColor, selectorTamanioIcono;
     private final HBox opciones;
     private final Button procesar;
-    private final Button cargarImagen, cargarImagenMezcla;
+    private final Button cargarImagen, cargarImagenMezcla,cargarDirectorio;
     private final Button guardarImagen;
     private final FileChooser fileChooser;
+    private final DirectoryChooser directoryChooser;
     private File imagen, imagenMezcla;
     private Slider sliderR, sliderG, sliderB;
     private TextField valorn, valorm;
     private ProgressIndicator progressIndicator;
     private Task task;
     private StackPane contenedorOpciones;
-    private BufferedImage mezcla;
-
+    private BufferedImage mezcla;    
+    private File directorioSeleccionado;
+    
     /**
      *
      * @param stage
@@ -75,12 +79,17 @@ public class Controles extends HBox {
         selectorColor = new ComboBox(FXCollections.observableArrayList("Red", "Green", "Blue"));
         selectorColor.setPromptText("Seleccionar color");
         /*ChoiceBox para escoger tamaño de icono*/
-        selectorTamanioIcono = new ComboBox(FXCollections.observableArrayList("16x16", "24x24", "32x32","48x48","64x64"));
+        selectorTamanioIcono = new ComboBox(FXCollections.observableArrayList("16x16", "24x24", "32x32", "48x48", "64x64"));
         selectorTamanioIcono.setPromptText("Seleccionar tamaño");
         /*Selector de archivo*/
         fileChooser = new FileChooser();
         fileChooser.setTitle("Cargar Imagen");
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Image Files", "*.jpg", "*.png"));
+        /*Selector de directorio*/
+        directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Cargar biblioteca");        
+        /*Cargar directorio*/
+        cargarDirectorio = new Button("Cargar Biblioteca");
         /*Cargar imagen mezcla*/
         cargarImagenMezcla = new Button("Cargar Imagen");
         /*ChoiceBox seleccionar Filtro*/
@@ -243,10 +252,24 @@ public class Controles extends HBox {
                     contenedorSliderAlpha.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedorSliderAlpha);
                     break;
-                case "Icono":           
+                case "Icono":
                     HBox contenedor7 = new HBox(selectorTamanioIcono);
                     contenedor7.setAlignment(Pos.CENTER);
                     opciones.getChildren().addAll(new Label("Opciones: "), contenedor7);
+                    break;
+                case "Foto Mosaico":
+                    Acciones.restringeTextFields(valorn = new TextField("10"), valorm = new TextField("10"));
+                    valorn.setPrefWidth(75);
+                    valorm.setPrefWidth(75);
+                    cargarDirectorio.setOnAction(e -> {
+                        directorioSeleccionado = directoryChooser.showDialog(stage);
+                    });
+                    Label labeln1 = new Label("Valor de n:  "),
+                     labelm1 = new Label("Valor de m: ");
+                    VBox contenedorTextFields8 = new VBox(new HBox(labeln1, valorn), new HBox(labelm1, valorm),cargarDirectorio);
+                    contenedorTextFields8.setAlignment(Pos.CENTER);
+                    contenedorTextFields8.setSpacing(5);
+                    opciones.getChildren().addAll(new Label("Opciones: "), contenedorTextFields8);
                     break;
             }
         });
@@ -514,11 +537,25 @@ public class Controles extends HBox {
                     case "Luz Negra":
                         task = FiltrosBlendingMarcaIconosLuzNegra.luzNegra(original, procesada);
                         break;
-                    case "Icono":                                               
+                    case "Icono":
                         task = FiltrosBlendingMarcaIconosLuzNegra.icono(original, procesada, Integer.parseInt(selectorTamanioIcono.getValue().toString().substring(0, 2)));
                         break;
                     case "Quitar marca de agua":
                         task = FiltrosBlendingMarcaIconosLuzNegra.quitaMarcaDeAgua(original, procesada);
+                        break;
+                    case "Foto Mosaico":
+                        temp = ImageIO.read(imagen);
+                        n = Integer.parseInt(valorn.getText());
+                        m = Integer.parseInt(valorm.getText());
+                        if (n > temp.getHeight() || m > temp.getWidth()) {
+                            Mensajes.muestraError("Error en los valores", "Los valores de n y m no deben exceder la altura\ny el ancho de la imagen respectivamente.");
+                            return;
+                        }
+                        if (n <= 0 || m <= 0) {
+                            Mensajes.muestraError("Error en los valores", "Los valores de n y m deben ser mayores que cero.");
+                            return;
+                        }
+                        task = FotoMosaico.creaFotoMosaico(original, procesada, directorioSeleccionado.getPath(), n, m);
                         break;
                 }
                 Acciones.comienzaProceso(progressIndicator, opciones, guardarImagen, procesar, task, contenedorImagenes, procesada, imagen);
